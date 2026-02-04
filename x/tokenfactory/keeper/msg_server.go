@@ -96,22 +96,25 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
-	if err != nil {
-		return nil, err
-	}
-
-	if msg.Sender != authorityMetadata.GetAdmin() {
-		return nil, types.ErrUnauthorized
-	}
-
 	if msg.BurnFromAddress == "" {
 		msg.BurnFromAddress = msg.Sender
-	} else if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableBurnFrom) {
-		return nil, types.ErrCapabilityNotEnabled
+	} else if msg.BurnFromAddress == msg.Sender {
+	} else {
+		if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableBurnFrom) {
+			return nil, types.ErrCapabilityNotEnabled
+		} else {
+			authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+			if err != nil {
+				return nil, err
+			}
+
+			if msg.Sender != authorityMetadata.GetAdmin() {
+				return nil, types.ErrUnauthorized
+			}
+		}
 	}
 
-	err = server.Keeper.burnFrom(ctx, msg.Amount, msg.BurnFromAddress)
+	err := server.Keeper.burnFrom(ctx, msg.Amount, msg.BurnFromAddress)
 	if err != nil {
 		return nil, err
 	}

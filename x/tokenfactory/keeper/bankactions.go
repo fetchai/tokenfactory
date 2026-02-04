@@ -39,12 +39,14 @@ func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string, isSudo b
 		sdk.NewCoins(amount))
 }
 
-func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string) error {
-	// verify that denom is an x/tokenfactory denom
-	_, _, err := types.DeconstructDenom(amount.Denom)
-	if err != nil {
-		return err
-	}
+func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string /*, isTokenOwner bool*/) error {
+	//// verify that denom is an x/tokenfactory denom
+	//if !isTokenOwner {
+	//	_, _, err := types.DeconstructDenom(amount.Denom)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
 
 	addr, err := sdk.AccAddressFromBech32(burnFrom)
 	if err != nil {
