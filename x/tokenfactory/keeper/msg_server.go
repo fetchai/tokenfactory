@@ -102,15 +102,15 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 	} else {
 		if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableBurnFrom) {
 			return nil, types.ErrCapabilityNotEnabled
-		} else {
-			authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
-			if err != nil {
-				return nil, err
-			}
+		}
 
-			if msg.Sender != authorityMetadata.GetAdmin() {
-				return nil, types.ErrUnauthorized
-			}
+		authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+		if err != nil {
+			return nil, err
+		}
+
+		if msg.Sender != authorityMetadata.GetAdmin() {
+			return nil, types.ErrUnauthorized
 		}
 	}
 
