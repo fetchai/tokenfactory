@@ -16,6 +16,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Params:        DefaultParams(),
 		FactoryDenoms: []GenesisDenom{},
+		SudoAdmins:    []string{},
 	}
 }
 

@@ -47,7 +47,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	communityPoolKeeper types.CommunityPoolKeeper,
 	enabledCapabilities []string,
-	// use DefaultIsSudoAdminFunc if you don't have a custom one
+// use DefaultIsSudoAdminFunc if nil
 	isSudoAdminFunc IsSudoAdmin,
 	authority string,
 ) Keeper {
@@ -56,7 +56,7 @@ func NewKeeper(
 		permAddrs[name] = authtypes.NewPermissionsForAddress(name, perms)
 	}
 
-	return Keeper{
+	k := Keeper{
 		cdc:       cdc,
 		storeKey:  storeKey,
 		permAddrs: permAddrs,
@@ -68,14 +68,28 @@ func NewKeeper(
 		authority: authority,
 
 		enabledCapabilities: enabledCapabilities,
-
-		IsSudoAdminFunc: isSudoAdminFunc,
 	}
+
+	if isSudoAdminFunc == nil {
+		k.IsSudoAdminFunc = k.DefaultIsSudoAdminFunc
+	} else {
+		k.IsSudoAdminFunc = isSudoAdminFunc
+	}
+
+	return k
 }
 
 // DefaultIsSudoAdminFunc returns false for all addresses.
-func DefaultIsSudoAdminFunc(_ context.Context, _ string) bool {
-	return false
+func (k Keeper) DefaultIsSudoAdminFunc(ctx context.Context, addr string) bool {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	store := k.GetSudoAdminsStore(sdkCtx)
+
+	accAddr, err := sdk.AccAddressFromBech32(addr)
+	if err != nil {
+		return false
+	}
+
+	return store.Has(accAddr.Bytes())
 }
 
 // GetAuthority returns the x/mint module's authority.
@@ -112,4 +126,10 @@ func (k Keeper) GetCreatorPrefixStore(ctx sdk.Context, creator string) store.KVS
 func (k Keeper) GetCreatorsPrefixStore(ctx sdk.Context) store.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorsPrefix())
+}
+
+// GetSudoAdminsStore returns the substore for sudoers
+func (k Keeper) GetSudoAdminsStore(ctx sdk.Context) store.KVStore {
+	store := ctx.KVStore(k.storeKey)
+	return prefix.NewStore(store, types.GetSudoAdmins())
 }

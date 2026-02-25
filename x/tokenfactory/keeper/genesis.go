@@ -30,6 +30,13 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 			panic(err)
 		}
 	}
+
+	for _, genAdmin := range genState.GetSudoAdmins() {
+		err := k.AddSudoAdmin(ctx, genAdmin)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the tokenfactory module's exported genesis.
