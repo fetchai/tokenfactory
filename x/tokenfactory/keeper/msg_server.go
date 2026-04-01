@@ -96,6 +96,10 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableBurn) {
+		return nil, types.ErrCapabilityNotEnabled
+	}
+
 	if msg.BurnFromAddress == "" {
 		msg.BurnFromAddress = msg.Sender
 	} else if msg.BurnFromAddress == msg.Sender {

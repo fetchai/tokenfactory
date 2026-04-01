@@ -3,6 +3,7 @@ package types
 const (
 	EnableSetMetadata   = "enable_metadata"
 	EnableForceTransfer = "enable_force_transfer"
+	EnableBurn          = "enable_burn"
 	EnableBurnFrom      = "enable_burn_from"
 	// Allows addresses of your choosing to mint tokens based on specific conditions.
 	// via the IsSudoAdminFunc.
