@@ -71,13 +71,19 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 		if msg.Sender != authorityMetadata.GetAdmin() {
 			return nil, types.ErrUnauthorized
 		}
+
+		// verify that denom is an x/tokenfactory denom
+		_, _, err = types.DeconstructDenom(msg.Amount.GetDenom())
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if msg.MintToAddress == "" {
 		msg.MintToAddress = msg.Sender
 	}
 
-	err = server.Keeper.mintTo(ctx, msg.Amount, msg.MintToAddress, isSudo)
+	err = server.Keeper.mintTo(ctx, msg.Amount, msg.MintToAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +127,12 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 
 			if msg.Sender != authorityMetadata.GetAdmin() {
 				return nil, types.ErrUnauthorized
+			}
+
+			// verify that denom is an x/tokenfactory denom
+			_, _, err = types.DeconstructDenom(msg.Amount.GetDenom())
+			if err != nil {
+				return nil, err
 			}
 		}
 	}
