@@ -11,15 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string, isSudo bool) error {
-	// verify that denom is an x/tokenfactory denom
-	if !isSudo {
-		_, _, err := types.DeconstructDenom(amount.Denom)
-		if err != nil {
-			return err
-		}
-	}
-
+func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string) error {
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(amount))
 	if err != nil {
 		return err
@@ -39,13 +31,7 @@ func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string, isSudo b
 		sdk.NewCoins(amount))
 }
 
-func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string) error {
-	// verify that denom is an x/tokenfactory denom
-	_, _, err := types.DeconstructDenom(amount.Denom)
-	if err != nil {
-		return err
-	}
-
+func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string /*, isTokenOwner bool*/) error {
 	addr, err := sdk.AccAddressFromBech32(burnFrom)
 	if err != nil {
 		return err

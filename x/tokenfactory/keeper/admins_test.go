@@ -15,6 +15,18 @@ func (suite *KeeperTestSuite) TestAdminMsgs() {
 
 	bankKeeper := suite.App.BankKeeper
 
+	tokenFactoryCapabilities := []string{
+		//NOTE(pb): Intentionally commented-out in order to disable new `EnableBurnOwn` capability in the context of this preexisting test.
+		//types.EnableBurnOwn,
+		types.EnableBurnFrom,
+		types.EnableForceTransfer,
+		types.EnableSetMetadata,
+		types.EnableSudoMint,
+		types.EnableCommunityPoolFeeFunding,
+	}
+	suite.App.TokenFactoryKeeper.SetEnabledCapabilities(suite.Ctx, tokenFactoryCapabilities)
+	suite.OverrideMsgServer(suite.App.TokenFactoryKeeper)
+
 	suite.CreateDefaultDenom()
 	// Make sure that the admin is set correctly
 	queryRes, err := suite.queryClient.DenomAuthorityMetadata(suite.Ctx.Context(), &types.QueryDenomAuthorityMetadataRequest{
