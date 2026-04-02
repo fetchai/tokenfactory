@@ -3,7 +3,10 @@ package types
 const (
 	EnableSetMetadata   = "enable_metadata"
 	EnableForceTransfer = "enable_force_transfer"
-	EnableBurnFrom      = "enable_burn_from"
+	// Allows to *ANY* owner of tokens (with *ANY* denomination) to burn these self-owned tokens.
+	// If disabled (not present), only admin of a denom or sudoer can execute the burn.
+	EnableBurnOwn  = "enable_burn_own"
+	EnableBurnFrom = "enable_burn_from"
 	// Allows addresses of your choosing to mint tokens based on specific conditions.
 	// via the IsSudoAdminFunc.
 	// NOTE: with SudoMint enabled, the sudo admin can mint `any` token, not just tokenfactory tokens.

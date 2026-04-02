@@ -148,6 +148,7 @@ var (
 	BinaryName      = "tokend"
 
 	tokenFactoryCapabilities = []string{
+		tokenfactorytypes.EnableBurnOwn,
 		tokenfactorytypes.EnableBurnFrom,
 		tokenfactorytypes.EnableForceTransfer,
 		tokenfactorytypes.EnableSetMetadata,
