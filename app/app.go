@@ -148,6 +148,7 @@ var (
 	BinaryName      = "tokend"
 
 	tokenFactoryCapabilities = []string{
+		tokenfactorytypes.EnableBurnOwn,
 		tokenfactorytypes.EnableBurnFrom,
 		tokenfactorytypes.EnableForceTransfer,
 		tokenfactorytypes.EnableSetMetadata,
@@ -519,7 +520,7 @@ func NewApp(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-		// register the governance hooks
+			// register the governance hooks
 		),
 	)
 
