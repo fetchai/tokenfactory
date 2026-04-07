@@ -2,10 +2,15 @@ package keeper
 
 import (
 	"context"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) AddSudoAdmin(ctx context.Context, admin string) error {
+type DefaultSudoAdminsImpl struct {
+	Keeper
+}
+
+func (k DefaultSudoAdminsImpl) AddSudoAdmin(ctx context.Context, admin string) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := k.GetSudoAdminsStore(sdkCtx)
 
@@ -21,7 +26,7 @@ func (k Keeper) AddSudoAdmin(ctx context.Context, admin string) error {
 	return nil
 }
 
-func (k Keeper) RemoveSudoAdmin(ctx context.Context, admin string) error {
+func (k DefaultSudoAdminsImpl) RemoveSudoAdmin(ctx context.Context, admin string) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := k.GetSudoAdminsStore(sdkCtx)
 
@@ -34,7 +39,7 @@ func (k Keeper) RemoveSudoAdmin(ctx context.Context, admin string) error {
 	return nil
 }
 
-func (k Keeper) IsSudoAdmin(ctx context.Context, admin string) bool {
+func (k DefaultSudoAdminsImpl) IsSudoAdmin(ctx context.Context, admin string) bool {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := k.GetSudoAdminsStore(sdkCtx)
 
