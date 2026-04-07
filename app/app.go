@@ -520,7 +520,7 @@ func NewApp(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-			// register the governance hooks
+		// register the governance hooks
 		),
 	)
 
@@ -555,6 +555,7 @@ func NewApp(
 		nil,
 		govModAddress,
 	)
+	app.TokenFactoryKeeper.IsSudoAdminFunc = tokenfactorykeeper.DefaultSudoAdminsImpl{Keeper: app.TokenFactoryKeeper}.IsSudoAdmin
 	wasmOpts = append(wasmOpts, bindings.RegisterCustomPlugins(app.BankKeeper, &app.TokenFactoryKeeper)...)
 
 	// Create Transfer Keepers
