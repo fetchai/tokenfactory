@@ -73,19 +73,6 @@ func NewKeeper(
 	return k
 }
 
-// DefaultIsSudoAdminFunc returns false for all addresses.
-func (k Keeper) DefaultIsSudoAdminFunc(ctx context.Context, addr string) bool {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	store := k.GetSudoAdminsStore(sdkCtx)
-
-	accAddr, err := sdk.AccAddressFromBech32(addr)
-	if err != nil {
-		return false
-	}
-
-	return store.Has(accAddr.Bytes())
-}
-
 func (k Keeper) _isSudoAdminFunc(ctx context.Context, addr string) bool {
 	if k.IsSudoAdminFunc != nil {
 		return k.IsSudoAdminFunc(ctx, addr)
