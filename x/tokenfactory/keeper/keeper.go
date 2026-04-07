@@ -47,7 +47,6 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	communityPoolKeeper types.CommunityPoolKeeper,
 	enabledCapabilities []string,
-// use DefaultIsSudoAdminFunc if nil
 	isSudoAdminFunc IsSudoAdmin,
 	authority string,
 ) Keeper {
@@ -68,12 +67,7 @@ func NewKeeper(
 		authority: authority,
 
 		enabledCapabilities: enabledCapabilities,
-	}
-
-	if isSudoAdminFunc == nil {
-		k.IsSudoAdminFunc = k.DefaultIsSudoAdminFunc
-	} else {
-		k.IsSudoAdminFunc = isSudoAdminFunc
+		IsSudoAdminFunc:     isSudoAdminFunc,
 	}
 
 	return k
@@ -90,6 +84,14 @@ func (k Keeper) DefaultIsSudoAdminFunc(ctx context.Context, addr string) bool {
 	}
 
 	return store.Has(accAddr.Bytes())
+}
+
+func (k Keeper) _isSudoAdminFunc(ctx context.Context, addr string) bool {
+	if k.IsSudoAdminFunc != nil {
+		return k.IsSudoAdminFunc(ctx, addr)
+	}
+
+	return false
 }
 
 // GetAuthority returns the x/mint module's authority.
