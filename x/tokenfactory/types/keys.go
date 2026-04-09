@@ -30,8 +30,7 @@ var (
 	DenomAuthorityMetadataKey = "authoritymetadata"
 	DenomsPrefixKey           = "denoms"
 	CreatorPrefixKey          = "creator"
-	AdminPrefixKey            = "admin"
-	KeySudoAdmins             = "sudoadmins"
+	SudoAdminsPrefixKey       = "sudoadmins"
 )
 
 // GetDenomPrefixStore returns the store prefix where all the data associated with a specific denom
@@ -51,7 +50,7 @@ func GetCreatorsPrefix() []byte {
 	return []byte(strings.Join([]string{CreatorPrefixKey, ""}, KeySeparator))
 }
 
-// GetSudoAdmins returns the store prefix where a list of all sudo admin addresses are stored
-func GetSudoAdmins() []byte {
-	return []byte(strings.Join([]string{KeySudoAdmins, ""}, KeySeparator))
+// GetSudoAdminsPrefix returns the store prefix where a list of all sudo admin addresses are stored
+func GetSudoAdminsPrefix() []byte {
+	return []byte(strings.Join([]string{SudoAdminsPrefixKey, ""}, KeySeparator))
 }
