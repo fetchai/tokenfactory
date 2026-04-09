@@ -62,12 +62,10 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 
 			sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
 			if tc.sudoer != "" {
-				if err := sa.AddSudoAdmin(suite.Ctx, tc.sudoer); err != nil {
-					suite.FailNow(err.Error())
-				}
+				suite.NoError(sa.AddSudoAdmin(suite.Ctx, tc.sudoer))
 
 				defer func() {
-					sa.RemoveSudoAdmin(suite.Ctx, tc.sudoer)
+					suite.NoError(sa.RemoveSudoAdmin(suite.Ctx, tc.sudoer))
 				}()
 			}
 
