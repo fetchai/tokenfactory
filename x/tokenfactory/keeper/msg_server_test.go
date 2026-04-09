@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
-	"context"
 	"fmt"
 
+	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -21,7 +21,7 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 		desc                  string
 		amount                int64
 		mintDenom             string
-		admin                 string
+		sender                string
 		sudoer                string
 		expectedMessageEvents int // the valid case should emit >= 1
 	}{
@@ -29,13 +29,13 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 			desc:      "denom does not exist",
 			amount:    10,
 			mintDenom: "factory/osmo1t7egva48prqmzl59x5ngv4zx0dtrwewc9m7z44/evmos",
-			admin:     suite.TestAccs[0].String(),
+			sender:    suite.TestAccs[0].String(),
 		},
 		{
 			desc:                  "success case tokenfactory",
 			amount:                10,
 			mintDenom:             suite.defaultDenom,
-			admin:                 suite.TestAccs[0].String(),
+			sender:                suite.TestAccs[0].String(),
 			expectedMessageEvents: 1,
 		},
 		// Sudo Mints
@@ -43,31 +43,38 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 			desc:                  "successful sudo mint executed by an allowed sudoer",
 			amount:                10,
 			mintDenom:             "unique",
-			admin:                 suite.TestAccs[0].String(),
+			sender:                suite.TestAccs[0].String(),
 			sudoer:                suite.TestAccs[0].String(), // this user can sudo mint
 			expectedMessageEvents: 1,
 		},
 		{
-			desc:      "invalid sudo mint from a non admin",
-			amount:    10,
-			mintDenom: "unique",
-			admin:     suite.TestAccs[0].String(),
-			sudoer:    "nope",
+			desc:                  "invalid sudo mint from a non admin",
+			amount:                10,
+			mintDenom:             "unique",
+			sender:                suite.TestAccs[0].String(),
+			sudoer:                suite.TestAccs[1].String(),
+			expectedMessageEvents: 0,
 		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
 
-			// Override the default IsSudoAdminFunc for testing
-			suite.App.TokenFactoryKeeper.IsSudoAdminFunc = func(_ context.Context, addr string) bool {
-				return tc.sudoer == addr
+			sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
+			if tc.sudoer != "" {
+				if err := sa.AddSudoAdmin(suite.Ctx, tc.sudoer); err != nil {
+					suite.FailNow(err.Error())
+				}
+
+				defer func() {
+					sa.RemoveSudoAdmin(suite.Ctx, tc.sudoer)
+				}()
 			}
 
 			suite.OverrideMsgServer(suite.App.TokenFactoryKeeper)
 
 			// Test mint message
-			suite.msgServer.Mint(ctx, types.NewMsgMint(tc.admin, sdk.NewInt64Coin(tc.mintDenom, tc.amount))) //nolint:errcheck
+			suite.msgServer.Mint(ctx, types.NewMsgMint(tc.sender, sdk.NewInt64Coin(tc.mintDenom, tc.amount))) //nolint:errcheck
 
 			// Ensure current number and type of event is emitted
 			suite.AssertEventEmitted(ctx, types.TypeMsgMint, tc.expectedMessageEvents)

@@ -53,7 +53,8 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	sudoEnabled := types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableSudoMint)
-	senderIsSudoAble := server._isSudoAdminFunc(goCtx, msg.Sender)
+	sa := SudoAdmins{Keeper: server.Keeper}
+	senderIsSudoAble := sa.IsSudoAdmin(goCtx, msg.Sender)
 	isSudo := sudoEnabled && senderIsSudoAble
 
 	if !isSudo {
@@ -116,7 +117,8 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		}
 
 		sudoEnabled := types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableSudoMint)
-		senderIsSudoAble := server.Keeper._isSudoAdminFunc(goCtx, msg.Sender)
+		sa := SudoAdmins{Keeper: server.Keeper}
+		senderIsSudoAble := sa.IsSudoAdmin(goCtx, msg.Sender)
 		isSudo := sudoEnabled && senderIsSudoAble
 
 		if !isSudo {

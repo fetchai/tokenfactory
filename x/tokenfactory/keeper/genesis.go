@@ -31,8 +31,9 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 		}
 	}
 
+	sa := SudoAdmins{Keeper: k}
 	for _, genAdmin := range genState.GetSudoAdmins() {
-		err := k.AddSudoAdmin(ctx, genAdmin)
+		err := sa.AddSudoAdmin(ctx, genAdmin)
 		if err != nil {
 			panic(err)
 		}

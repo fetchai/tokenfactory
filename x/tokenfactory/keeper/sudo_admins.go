@@ -2,10 +2,24 @@ package keeper
 
 import (
 	"context"
+
+	"cosmossdk.io/store/prefix"
+	store "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 )
 
-func (k Keeper) AddSudoAdmin(ctx context.Context, admin string) error {
+type SudoAdmins struct {
+	Keeper
+}
+
+// GetSudoAdminsStore returns the substore for sudoers
+func (k SudoAdmins) GetSudoAdminsStore(ctx sdk.Context) store.KVStore {
+	store := ctx.KVStore(k.storeKey)
+	return prefix.NewStore(store, types.GetSudoAdmins())
+}
+
+func (k SudoAdmins) AddSudoAdmin(ctx context.Context, admin string) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := k.GetSudoAdminsStore(sdkCtx)
 
@@ -21,7 +35,7 @@ func (k Keeper) AddSudoAdmin(ctx context.Context, admin string) error {
 	return nil
 }
 
-func (k Keeper) RemoveSudoAdmin(ctx context.Context, admin string) error {
+func (k SudoAdmins) RemoveSudoAdmin(ctx context.Context, admin string) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := k.GetSudoAdminsStore(sdkCtx)
 
@@ -34,7 +48,7 @@ func (k Keeper) RemoveSudoAdmin(ctx context.Context, admin string) error {
 	return nil
 }
 
-func (k Keeper) IsSudoAdmin(ctx context.Context, admin string) bool {
+func (k SudoAdmins) IsSudoAdmin(ctx context.Context, admin string) bool {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := k.GetSudoAdminsStore(sdkCtx)
 
