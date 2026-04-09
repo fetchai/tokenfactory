@@ -25,28 +25,27 @@ func (suite *KeeperTestSuite) TestSudoAdminsStoreRejectsInvalidAddress() {
 	sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
 
 	suite.Require().Error(sa.AddSudoAdmin(suite.Ctx, "not-a-bech32-address"))
-	suite.Require().Error(sa.RemoveSudoAdmin(suite.Ctx, "not-a-bech32-address"))
 	suite.Require().False(sa.IsSudoAdmin(suite.Ctx, "not-a-bech32-address"))
+	suite.Require().Error(sa.RemoveSudoAdmin(suite.Ctx, "not-a-bech32-address"))
 }
 
 func (suite *KeeperTestSuite) TestSudoAdminMintAnyDenom() {
 	sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
 	suite.Require().NoError(sa.AddSudoAdmin(suite.Ctx, suite.TestAccs[1].String()))
 
-	nativeDenom := types.DefaultParams().DenomCreationFee[0].Denom
-	before := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], nativeDenom).Amount
+	before := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 
 	_, err := suite.msgServer.Mint(
 		suite.Ctx,
 		types.NewMsgMintTo(
 			suite.TestAccs[1].String(),
-			sdk.NewInt64Coin(nativeDenom, 77),
+			sdk.NewInt64Coin(NativeDenom, 77),
 			suite.TestAccs[2].String(),
 		),
 	)
 	suite.Require().NoError(err)
 
-	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], nativeDenom).Amount
+	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 	suite.Require().Equal(before.AddRaw(77), after)
 }
 
@@ -57,37 +56,35 @@ func (suite *KeeperTestSuite) TestSudoAdminMintFailsWhenCapabilityDisabled() {
 	suite.App.TokenFactoryKeeper.SetEnabledCapabilities(suite.Ctx, []string{})
 	suite.OverrideMsgServer(suite.App.TokenFactoryKeeper)
 
-	nativeDenom := types.DefaultParams().DenomCreationFee[0].Denom
-	before := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], nativeDenom).Amount
+	before := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 
 	_, err := suite.msgServer.Mint(
 		suite.Ctx,
 		types.NewMsgMintTo(
 			suite.TestAccs[1].String(),
-			sdk.NewInt64Coin(nativeDenom, 77),
+			sdk.NewInt64Coin(NativeDenom, 77),
 			suite.TestAccs[2].String(),
 		),
 	)
 	suite.Require().Error(err)
 
-	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], nativeDenom).Amount
+	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 	suite.Require().Equal(before, after)
 }
 
 func (suite *KeeperTestSuite) TestNonSudoCannotMintAnyDenom() {
-	nativeDenom := types.DefaultParams().DenomCreationFee[0].Denom
-	before := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], nativeDenom).Amount
+	before := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 
 	_, err := suite.msgServer.Mint(
 		suite.Ctx,
 		types.NewMsgMintTo(
 			suite.TestAccs[1].String(),
-			sdk.NewInt64Coin(nativeDenom, 77),
+			sdk.NewInt64Coin(NativeDenom, 77),
 			suite.TestAccs[2].String(),
 		),
 	)
 	suite.Require().Error(err)
 
-	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], nativeDenom).Amount
+	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 	suite.Require().Equal(before, after)
 }
