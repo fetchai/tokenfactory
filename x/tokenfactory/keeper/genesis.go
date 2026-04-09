@@ -59,8 +59,11 @@ func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 		})
 	}
 
+	sa := SudoAdmins{Keeper: k}
+
 	return &types.GenesisState{
 		FactoryDenoms: genDenoms,
 		Params:        k.GetParams(ctx),
+		SudoAdmins:    sa.GetAllSudoAdmins(ctx),
 	}
 }
