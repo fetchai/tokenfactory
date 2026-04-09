@@ -129,7 +129,7 @@ test:
 COV_ROOT="/tmp/tokenfactory-coverage"
 COV_UNIT_E2E="${COV_ROOT}/unit-e2e"
 COV_SIMULATION="${COV_ROOT}/simulation"
-COV_PKG="github.com/MissingNO57/tokenfactory/..."
+COV_PKG="github.com/fetchai/tokenfactory/..."
 COV_SIM_CMD=${COV_SIMULATION}/simulation.test
 COV_SIM_COMMON=-Enabled=True -NumBlocks=100 -Commit=true -Period=5 -Verbose=false -test.v -test.gocoverdir=${COV_SIMULATION}
 

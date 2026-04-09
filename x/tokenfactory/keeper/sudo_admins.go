@@ -16,7 +16,7 @@ type SudoAdmins struct {
 // GetSudoAdminsStore returns the substore for sudoers
 func (k SudoAdmins) GetSudoAdminsStore(ctx sdk.Context) store.KVStore {
 	store := ctx.KVStore(k.storeKey)
-	return prefix.NewStore(store, types.GetSudoAdmins())
+	return prefix.NewStore(store, types.GetSudoAdminsPrefix())
 }
 
 func (k SudoAdmins) AddSudoAdmin(ctx context.Context, admin string) error {
@@ -67,7 +67,7 @@ func (k SudoAdmins) GetAllSudoAdmins(ctx context.Context) []string {
 	defer iterator.Close()
 
 	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
-	admins := []string{}
+	var admins []string
 	for ; iterator.Valid(); iterator.Next() {
 		admin, err := sdk.Bech32ifyAddressBytes(prefix, iterator.Key())
 		if err != nil {

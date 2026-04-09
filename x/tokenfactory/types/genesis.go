@@ -28,14 +28,14 @@ func (gs GenesisState) Validate() error {
 		return err
 	}
 
-	seenDenoms := map[string]bool{}
-	seenSudoAdmins := map[string]bool{}
+	seenDenoms := NewSet[string]()
+	seenSudoAdmins := NewSet[string]()
 
 	for _, denom := range gs.GetFactoryDenoms() {
-		if seenDenoms[denom.GetDenom()] {
+		if seenDenoms.Contains(denom.GetDenom()) {
 			return errorsmod.Wrapf(ErrInvalidGenesis, "duplicate denom: %s", denom.GetDenom())
 		}
-		seenDenoms[denom.GetDenom()] = true
+		seenDenoms.Add(denom.GetDenom())
 
 		_, _, err := DeconstructDenom(denom.GetDenom())
 		if err != nil {
@@ -51,10 +51,10 @@ func (gs GenesisState) Validate() error {
 	}
 
 	for _, sudoAdmin := range gs.GetSudoAdmins() {
-		if seenSudoAdmins[sudoAdmin] {
+		if seenSudoAdmins.Contains(sudoAdmin) {
 			return errorsmod.Wrapf(ErrInvalidGenesis, "duplicate sudo admin: %s", sudoAdmin)
 		}
-		seenSudoAdmins[sudoAdmin] = true
+		seenSudoAdmins.Add(sudoAdmin)
 
 		if _, err := sdk.AccAddressFromBech32(sudoAdmin); err != nil {
 			return errorsmod.Wrapf(ErrInvalidGenesis, "invalid sudo admin address (%s)", err)
