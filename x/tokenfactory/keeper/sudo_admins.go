@@ -16,7 +16,7 @@ type SudoAdmins struct {
 // GetSudoAdminsStore returns the substore for sudoers
 func (k SudoAdmins) GetSudoAdminsStore(ctx sdk.Context) store.KVStore {
 	store := ctx.KVStore(k.storeKey)
-	return prefix.NewStore(store, types.GetSudoAdmins())
+	return prefix.NewStore(store, types.GetSudoAdminsPrefix())
 }
 
 func (k SudoAdmins) AddSudoAdmin(ctx context.Context, admin string) error {
