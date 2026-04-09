@@ -33,8 +33,6 @@ type (
 		// the address capable of executing a MsgUpdateParams message. Typically, this
 		// should be the x/gov module account.
 		authority string
-
-		IsSudoAdminFunc IsSudoAdmin
 	}
 )
 
@@ -47,7 +45,6 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	communityPoolKeeper types.CommunityPoolKeeper,
 	enabledCapabilities []string,
-	isSudoAdminFunc IsSudoAdmin,
 	authority string,
 ) Keeper {
 	permAddrs := make(map[string]authtypes.PermissionsForAddress)
@@ -67,18 +64,9 @@ func NewKeeper(
 		authority: authority,
 
 		enabledCapabilities: enabledCapabilities,
-		IsSudoAdminFunc:     isSudoAdminFunc,
 	}
 
 	return k
-}
-
-func (k Keeper) _isSudoAdminFunc(ctx context.Context, addr string) bool {
-	if k.IsSudoAdminFunc != nil {
-		return k.IsSudoAdminFunc(ctx, addr)
-	}
-
-	return false
 }
 
 // GetAuthority returns the x/mint module's authority.
@@ -115,10 +103,4 @@ func (k Keeper) GetCreatorPrefixStore(ctx sdk.Context, creator string) store.KVS
 func (k Keeper) GetCreatorsPrefixStore(ctx sdk.Context) store.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorsPrefix())
-}
-
-// GetSudoAdminsStore returns the substore for sudoers
-func (k Keeper) GetSudoAdminsStore(ctx sdk.Context) store.KVStore {
-	store := ctx.KVStore(k.storeKey)
-	return prefix.NewStore(store, types.GetSudoAdmins())
 }
