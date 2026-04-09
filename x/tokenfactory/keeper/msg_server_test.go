@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
-	"context"
 	"fmt"
 
+	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -52,16 +52,23 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 			amount:    10,
 			mintDenom: "unique",
 			admin:     suite.TestAccs[0].String(),
-			sudoer:    "nope",
+			sudoer:    suite.TestAccs[1].String(),
 		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
 
-			// Override the default IsSudoAdminFunc for testing
-			suite.App.TokenFactoryKeeper.IsSudoAdminFunc = func(_ context.Context, addr string) bool {
-				return tc.sudoer == addr
+			dsa := keeper.DefaultSudoAdminsImpl{Keeper: suite.App.TokenFactoryKeeper}
+			suite.App.TokenFactoryKeeper.IsSudoAdminFunc = dsa.IsSudoAdmin
+			if tc.sudoer != "" {
+				if err := dsa.AddSudoAdmin(suite.Ctx, tc.sudoer); err != nil {
+					suite.FailNow(err.Error())
+				}
+
+				defer func() {
+					dsa.RemoveSudoAdmin(suite.Ctx, tc.sudoer)
+				}()
 			}
 
 			suite.OverrideMsgServer(suite.App.TokenFactoryKeeper)
