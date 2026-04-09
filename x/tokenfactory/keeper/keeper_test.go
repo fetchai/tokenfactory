@@ -14,6 +14,9 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
+// NativeDenom is denomination which is *NOT* related to tokenfactory
+const NativeDenom = "any_non_tokenfactory_denom"
+
 type KeeperTestSuite struct {
 	apptesting.KeeperTestHelper
 
@@ -40,6 +43,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.queryClient = types.NewQueryClient(suite.QueryHelper)
 	suite.bankQueryClient = banktypes.NewQueryClient(suite.QueryHelper)
 	suite.msgServer = keeper.NewMsgServerImpl(suite.App.TokenFactoryKeeper)
+
 }
 
 func (suite *KeeperTestSuite) CreateDefaultDenom() {
