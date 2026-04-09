@@ -67,7 +67,7 @@ func (k SudoAdmins) GetAllSudoAdmins(ctx context.Context) []string {
 	defer iterator.Close()
 
 	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
-	admins := []string{}
+	var admins []string
 	for ; iterator.Valid(); iterator.Next() {
 		admin, err := sdk.Bech32ifyAddressBytes(prefix, iterator.Key())
 		if err != nil {
