@@ -41,7 +41,7 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 
 // ExportGenesis returns the tokenfactory module's exported genesis.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
-	genDenoms := []types.GenesisDenom{}
+	var genDenoms []types.GenesisDenom
 	iterator := k.GetAllDenomsIterator(ctx)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
