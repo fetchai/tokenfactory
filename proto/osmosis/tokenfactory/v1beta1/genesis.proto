@@ -21,7 +21,7 @@ message GenesisState {
   repeated string sudo_admins = 3 [
     (cosmos_proto.scalar) = "cosmos.AddressString",
     (gogoproto.moretags) = "yaml:\"sudo_admins\"",
-    (gogoproto.nullable)     = false
+    (gogoproto.nullable) = false
   ];
 }
 

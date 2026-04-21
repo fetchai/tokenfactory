@@ -174,17 +174,38 @@ coverage: ## Run coverage report
 
 protoVer=0.14.0
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
-protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
+
+DOCKER_UID ?= $(shell echo $${SUDO_UID:-$$(id -u)})
+DOCKER_GID ?= $(shell echo $${SUDO_GID:-$$(id -g)})
+
+protoImage=$(DOCKER) run --rm \
+	-u $(DOCKER_UID):$(DOCKER_GID) \
+	-v $(CURDIR):/workspace \
+	--workdir /workspace \
+	-e HOME=/tmp \
+	-e TMPDIR=/tmp \
+	-e XDG_CACHE_HOME=/tmp/.cache \
+	-e GOPATH=/tmp/go \
+	-e GOMODCACHE=/tmp/go/pkg/mod \
+	-e GOCACHE=/tmp/.cache/go-build \
+	-e GOTOOLCHAIN=auto \
+	$(protoImageName)
 
 proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
 	@echo "Generating protobuf files..."
 	@$(protoImage) sh ./scripts/protocgen.sh
-	@go mod tidy
+	@mkdir -p "$(HOME)/go/pkg/mod" "$(HOME)/.cache/go-build"
+	@HOME="$(HOME)" \
+		GOPATH="$(HOME)/go" \
+		GOMODCACHE="$(HOME)/go/pkg/mod" \
+		GOCACHE="$(HOME)/.cache/go-build" \
+		GOTOOLCHAIN=auto \
+		go mod tidy
 
 proto-format:
-	@$(protoImage) find ./ -name "*.proto" -exec clang-format -i {} \;
+	@$(protoImage) sh -c 'find ./proto -name "*.proto" | while read -r file; do tmp=$$(mktemp /tmp/clang-format.XXXXXX); clang-format "$$file" > "$$tmp" && dd if="$$tmp" of="$$file" status=none && rm -f "$$tmp"; done'
 
 proto-lint:
 	@$(protoImage) buf lint proto/ --error-format=json
