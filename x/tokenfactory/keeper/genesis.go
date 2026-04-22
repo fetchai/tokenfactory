@@ -30,11 +30,18 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 			panic(err)
 		}
 	}
+
+	sa := SudoAdmins{Keeper: k}
+	for _, genAdmin := range genState.GetSudoAdmins() {
+		if err := sa.AddSudoAdmin(ctx, genAdmin); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the tokenfactory module's exported genesis.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
-	genDenoms := []types.GenesisDenom{}
+	var genDenoms []types.GenesisDenom
 	iterator := k.GetAllDenomsIterator(ctx)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -51,8 +58,11 @@ func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 		})
 	}
 
+	sa := SudoAdmins{Keeper: k}
+
 	return &types.GenesisState{
 		FactoryDenoms: genDenoms,
 		Params:        k.GetParams(ctx),
+		SudoAdmins:    sa.GetAllSudoAdmins(ctx),
 	}
 }

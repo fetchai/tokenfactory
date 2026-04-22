@@ -4,6 +4,7 @@ package osmosis.tokenfactory.v1beta1;
 import "gogoproto/gogo.proto";
 import "osmosis/tokenfactory/v1beta1/authorityMetadata.proto";
 import "osmosis/tokenfactory/v1beta1/params.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types";
 
@@ -15,6 +16,12 @@ message GenesisState {
   repeated GenesisDenom factory_denoms = 2 [
     (gogoproto.moretags) = "yaml:\"factory_denoms\"",
     (gogoproto.nullable) = false
+  ];
+
+  repeated string sudo_admins = 3 [
+    (cosmos_proto.scalar) = "cosmos.AddressString",
+    (gogoproto.moretags) = "yaml:\"sudo_admins\"",
+    (gogoproto.nullable)     = false
   ];
 }
 

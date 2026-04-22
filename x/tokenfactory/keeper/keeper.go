@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
@@ -16,9 +15,6 @@ import (
 )
 
 type (
-	// IsAdmin is a function signature that checks if an address is an admin.
-	IsSudoAdmin func(ctx context.Context, addr string) bool
-
 	Keeper struct {
 		cdc       codec.BinaryCodec
 		storeKey  store.StoreKey
@@ -33,8 +29,6 @@ type (
 		// the address capable of executing a MsgUpdateParams message. Typically, this
 		// should be the x/gov module account.
 		authority string
-
-		IsSudoAdminFunc IsSudoAdmin
 	}
 )
 
@@ -47,8 +41,6 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	communityPoolKeeper types.CommunityPoolKeeper,
 	enabledCapabilities []string,
-	// use DefaultIsSudoAdminFunc if you don't have a custom one
-	isSudoAdminFunc IsSudoAdmin,
 	authority string,
 ) Keeper {
 	permAddrs := make(map[string]authtypes.PermissionsForAddress)
@@ -56,7 +48,7 @@ func NewKeeper(
 		permAddrs[name] = authtypes.NewPermissionsForAddress(name, perms)
 	}
 
-	return Keeper{
+	k := Keeper{
 		cdc:       cdc,
 		storeKey:  storeKey,
 		permAddrs: permAddrs,
@@ -68,14 +60,9 @@ func NewKeeper(
 		authority: authority,
 
 		enabledCapabilities: enabledCapabilities,
-
-		IsSudoAdminFunc: isSudoAdminFunc,
 	}
-}
 
-// DefaultIsSudoAdminFunc returns false for all addresses.
-func DefaultIsSudoAdminFunc(_ context.Context, _ string) bool {
-	return false
+	return k
 }
 
 // GetAuthority returns the x/mint module's authority.
