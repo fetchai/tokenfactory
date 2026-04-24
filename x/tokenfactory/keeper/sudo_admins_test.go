@@ -88,3 +88,25 @@ func (suite *KeeperTestSuite) TestNonSudoCannotMintAnyDenom() {
 	after := suite.App.BankKeeper.GetBalance(suite.Ctx, suite.TestAccs[2], NativeDenom).Amount
 	suite.Require().Equal(before, after)
 }
+
+func (suite *KeeperTestSuite) TestSudoAdminQueries() {
+	sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
+	adminA := suite.TestAccs[0].String()
+	adminB := suite.TestAccs[1].String()
+	nonAdmin := suite.TestAccs[2].String()
+
+	suite.Require().NoError(sa.AddSudoAdmin(suite.Ctx, adminA))
+	suite.Require().NoError(sa.AddSudoAdmin(suite.Ctx, adminB))
+
+	isSudoRes, err := suite.queryClient.IsSudoAdmin(suite.Ctx.Context(), &types.QueryIsSudoAdminRequest{Address: adminA})
+	suite.Require().NoError(err)
+	suite.Require().True(isSudoRes.IsSudoAdmin)
+
+	notSudoRes, err := suite.queryClient.IsSudoAdmin(suite.Ctx.Context(), &types.QueryIsSudoAdminRequest{Address: nonAdmin})
+	suite.Require().NoError(err)
+	suite.Require().False(notSudoRes.IsSudoAdmin)
+
+	allSudoRes, err := suite.queryClient.SudoAdmins(suite.Ctx.Context(), &types.QuerySudoAdminsRequest{})
+	suite.Require().NoError(err)
+	suite.Require().ElementsMatch([]string{adminA, adminB}, allSudoRes.SudoAdmins)
+}

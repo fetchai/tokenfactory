@@ -3,7 +3,6 @@ package osmosis.tokenfactory.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
 import "osmosis/tokenfactory/v1beta1/authorityMetadata.proto";
 import "osmosis/tokenfactory/v1beta1/params.proto";
 
@@ -39,7 +38,20 @@ service Query {
       returns (QueryDenomsFromAdminResponse) {
     option (google.api.http).get =
         "/osmosis/tokenfactory/v1beta1/denoms_from_admin/{admin}";
-      }
+  }
+
+  // IsSudoAdmin defines a gRPC query method for checking whether an address is
+  // a sudo admin.
+  rpc IsSudoAdmin(QueryIsSudoAdminRequest) returns (QueryIsSudoAdminResponse) {
+    option (google.api.http).get =
+        "/osmosis/tokenfactory/v1beta1/is_sudo_admin/{address}";
+  }
+
+  // SudoAdmins defines a gRPC query method for fetching all sudo admin
+  // addresses.
+  rpc SudoAdmins(QuerySudoAdminsRequest) returns (QuerySudoAdminsResponse) {
+    option (google.api.http).get = "/osmosis/tokenfactory/v1beta1/sudo_admins";
+  }
 }
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
@@ -88,4 +100,27 @@ message QueryDenomsFromAdminRequest {
 // DenomsFromAdmin gRPC query.
 message QueryDenomsFromAdminResponse {
   repeated string denoms = 1 [ (gogoproto.moretags) = "yaml:\"denoms\"" ];
+}
+
+// QueryIsSudoAdminRequest defines the request structure for the
+// IsSudoAdmin gRPC query.
+message QueryIsSudoAdminRequest {
+  string address = 1 [(gogoproto.moretags) = "yaml:\"address\""];
+}
+
+// QueryIsSudoAdminResponse defines the response structure for the
+// IsSudoAdmin gRPC query.
+message QueryIsSudoAdminResponse {
+  bool is_sudo_admin = 1 [(gogoproto.moretags) = "yaml:\"is_sudo_admin\""];
+}
+
+// QuerySudoAdminsRequest defines the request structure for the
+// SudoAdmins gRPC query.
+message QuerySudoAdminsRequest {}
+
+// QuerySudoAdminsResponse defines the response structure for the
+// SudoAdmins gRPC query.
+message QuerySudoAdminsResponse {
+  repeated string sudo_admins = 1
+      [(gogoproto.moretags) = "yaml:\"sudo_admins\""];
 }

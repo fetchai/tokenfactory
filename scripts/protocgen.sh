@@ -11,9 +11,11 @@ cd ..
 
 
 
-# move proto files to the right places
-cp -r ./github.com/strangelove-ventures/tokenfactory/x/* x/
-rm -rf ./github.com
+# move proto files to the right places when the plugin emits a github.com module tree.
+if [ -d ./github.com/strangelove-ventures/tokenfactory/x ]; then
+  cp -r ./github.com/strangelove-ventures/tokenfactory/x/* x/
+  rm -rf ./github.com
+fi
 
 # replace incorrect namespace
 find ./x -type f -name '*.pb.go' -exec sed -i -e 's|cosmossdk.io/x/bank/types|github.com/cosmos/cosmos-sdk/x/bank/types|g' {} \;

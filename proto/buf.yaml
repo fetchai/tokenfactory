@@ -1,6 +1,6 @@
 version: v1
 deps:
-  - buf.build/cosmos/cosmos-sdk:v0.50.3 # pin the Cosmos SDK version
+  - buf.build/cosmos/cosmos-sdk:v0.53.4 # pin the Cosmos SDK version
   - buf.build/cosmos/cosmos-proto
   - buf.build/cosmos/gogo-proto
   - buf.build/googleapis/googleapis
@@ -12,6 +12,10 @@ lint:
   except:
     - UNARY_RPC
     - COMMENT_FIELD
+    - COMMENT_RPC
+    - COMMENT_MESSAGE
     - SERVICE_SUFFIX
     - PACKAGE_VERSION_SUFFIX
     - RPC_REQUEST_STANDARD_NAME
+    - FILE_LOWER_SNAKE_CASE
+    - FIELD_LOWER_SNAKE_CASE

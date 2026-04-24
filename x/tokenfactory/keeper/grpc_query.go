@@ -42,3 +42,13 @@ func (k Keeper) DenomsFromAdmin(ctx context.Context, req *types.QueryDenomsFromA
 	}
 	return &types.QueryDenomsFromAdminResponse{Denoms: denoms}, nil
 }
+
+func (k Keeper) IsSudoAdmin(ctx context.Context, req *types.QueryIsSudoAdminRequest) (*types.QueryIsSudoAdminResponse, error) {
+	sa := SudoAdmins{Keeper: k}
+	return &types.QueryIsSudoAdminResponse{IsSudoAdmin: sa.IsSudoAdmin(ctx, req.GetAddress())}, nil
+}
+
+func (k Keeper) SudoAdmins(ctx context.Context, _ *types.QuerySudoAdminsRequest) (*types.QuerySudoAdminsResponse, error) {
+	sa := SudoAdmins{Keeper: k}
+	return &types.QuerySudoAdminsResponse{SudoAdmins: sa.GetAllSudoAdmins(ctx)}, nil
+}
