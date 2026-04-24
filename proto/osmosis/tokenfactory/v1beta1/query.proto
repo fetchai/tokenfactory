@@ -18,33 +18,26 @@ service Query {
 
   // DenomAuthorityMetadata defines a gRPC query method for fetching
   // DenomAuthorityMetadata for a particular denom.
-  rpc DenomAuthorityMetadata(QueryDenomAuthorityMetadataRequest)
-      returns (QueryDenomAuthorityMetadataResponse) {
-    option (google.api.http).get =
-        "/osmosis/tokenfactory/v1beta1/denoms/{denom}/authority_metadata";
+  rpc DenomAuthorityMetadata(QueryDenomAuthorityMetadataRequest) returns (QueryDenomAuthorityMetadataResponse) {
+    option (google.api.http).get = "/osmosis/tokenfactory/v1beta1/denoms/{denom}/authority_metadata";
   }
 
   // DenomsFromCreator defines a gRPC query method for fetching all
   // denominations created by a specific admin/creator.
-  rpc DenomsFromCreator(QueryDenomsFromCreatorRequest)
-      returns (QueryDenomsFromCreatorResponse) {
-    option (google.api.http).get =
-        "/osmosis/tokenfactory/v1beta1/denoms_from_creator/{creator}";
+  rpc DenomsFromCreator(QueryDenomsFromCreatorRequest) returns (QueryDenomsFromCreatorResponse) {
+    option (google.api.http).get = "/osmosis/tokenfactory/v1beta1/denoms_from_creator/{creator}";
   }
 
   // DenomsFromAdmin defines a gRPC query method for fetching all
   // denominations owned by a specific admin.
-  rpc DenomsFromAdmin(QueryDenomsFromAdminRequest)
-      returns (QueryDenomsFromAdminResponse) {
-    option (google.api.http).get =
-        "/osmosis/tokenfactory/v1beta1/denoms_from_admin/{admin}";
+  rpc DenomsFromAdmin(QueryDenomsFromAdminRequest) returns (QueryDenomsFromAdminResponse) {
+    option (google.api.http).get = "/osmosis/tokenfactory/v1beta1/denoms_from_admin/{admin}";
   }
 
   // IsSudoAdmin defines a gRPC query method for checking whether an address is
   // a sudo admin.
   rpc IsSudoAdmin(QueryIsSudoAdminRequest) returns (QueryIsSudoAdminResponse) {
-    option (google.api.http).get =
-        "/osmosis/tokenfactory/v1beta1/is_sudo_admin/{address}";
+    option (google.api.http).get = "/osmosis/tokenfactory/v1beta1/is_sudo_admin/{address}";
   }
 
   // SudoAdmins defines a gRPC query method for fetching all sudo admin
@@ -60,13 +53,13 @@ message QueryParamsRequest {}
 // QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params defines the parameters of the module.
-  Params params = 1 [ (gogoproto.nullable) = false ];
+  Params params = 1 [(gogoproto.nullable) = false];
 }
 
 // QueryDenomAuthorityMetadataRequest defines the request structure for the
 // DenomAuthorityMetadata gRPC query.
 message QueryDenomAuthorityMetadataRequest {
-  string denom = 1 [ (gogoproto.moretags) = "yaml:\"denom\"" ];
+  string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
 }
 
 // QueryDenomAuthorityMetadataResponse defines the response structure for the
@@ -81,25 +74,25 @@ message QueryDenomAuthorityMetadataResponse {
 // QueryDenomsFromCreatorRequest defines the request structure for the
 // DenomsFromCreator gRPC query.
 message QueryDenomsFromCreatorRequest {
-  string creator = 1 [ (gogoproto.moretags) = "yaml:\"creator\"" ];
+  string creator = 1 [(gogoproto.moretags) = "yaml:\"creator\""];
 }
 
 // QueryDenomsFromCreatorRequest defines the response structure for the
 // DenomsFromCreator gRPC query.
 message QueryDenomsFromCreatorResponse {
-  repeated string denoms = 1 [ (gogoproto.moretags) = "yaml:\"denoms\"" ];
+  repeated string denoms = 1 [(gogoproto.moretags) = "yaml:\"denoms\""];
 }
 
 // QueryDenomsFromAdminRequest defines the request structure for the
 // DenomsFromAdmin gRPC query.
 message QueryDenomsFromAdminRequest {
-  string admin = 1 [ (gogoproto.moretags) = "yaml:\"admin\"" ];
+  string admin = 1 [(gogoproto.moretags) = "yaml:\"admin\""];
 }
 
 // QueryDenomsFromAdminRequest defines the response structure for the
 // DenomsFromAdmin gRPC query.
 message QueryDenomsFromAdminResponse {
-  repeated string denoms = 1 [ (gogoproto.moretags) = "yaml:\"denoms\"" ];
+  repeated string denoms = 1 [(gogoproto.moretags) = "yaml:\"denoms\""];
 }
 
 // QueryIsSudoAdminRequest defines the request structure for the
@@ -121,6 +114,5 @@ message QuerySudoAdminsRequest {}
 // QuerySudoAdminsResponse defines the response structure for the
 // SudoAdmins gRPC query.
 message QuerySudoAdminsResponse {
-  repeated string sudo_admins = 1
-      [(gogoproto.moretags) = "yaml:\"sudo_admins\""];
+  repeated string sudo_admins = 1 [(gogoproto.moretags) = "yaml:\"sudo_admins\""];
 }

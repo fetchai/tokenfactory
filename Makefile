@@ -175,8 +175,8 @@ coverage: ## Run coverage report
 protoVer=0.14.0
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 
-DOCKER_UID ?= $(shell echo $${SUDO_UID:-$$(id -u)})
-DOCKER_GID ?= $(shell echo $${SUDO_GID:-$$(id -g)})
+DOCKER_UID := $(shell id -u)
+DOCKER_GID := $(shell id -g)
 
 protoImage=$(DOCKER) run --rm \
 	-u $(DOCKER_UID):$(DOCKER_GID) \
@@ -205,7 +205,8 @@ proto-gen:
 		go mod tidy
 
 proto-format:
-	@$(protoImage) find ./ -name "*.proto" -exec clang-format -i -style=file {} \;
+	@$(protoImage) buf format -w;
+	#@$(protoImage) find ./ -name "*.proto" -exec clang-format -i -style=file {} \;
 
 proto-lint:
 	@$(protoImage) buf lint proto/ --error-format=json
