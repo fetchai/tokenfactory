@@ -1,0 +1,31 @@
+Language: Proto
+BasedOnStyle: Google
+
+# Disable most destructive behavior
+ColumnLimit: 0
+AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: Always
+
+# Don’t realign stuff
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: false
+
+# Don’t reorder anything
+SortIncludes: false
+IncludeBlocks: Preserve
+
+# Keep your spacing as much as possible
+SpacesInSquareBrackets: false
+SpacesInParentheses: false
+SpacesInAngles: false
+
+# Don’t reflow comments
+ReflowComments: false
+
+# Keep line breaks
+BreakBeforeBraces: Attach
+PenaltyBreakBeforeFirstCallParameter: 1000000
+PenaltyBreakComment: 1000000
+PenaltyBreakString: 1000000
