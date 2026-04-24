@@ -205,7 +205,7 @@ proto-gen:
 		go mod tidy
 
 proto-format:
-	@$(protoImage) sh -c 'find ./proto -name "*.proto" | while read -r file; do tmp=$$(mktemp /tmp/clang-format.XXXXXX); clang-format "$$file" > "$$tmp" && dd if="$$tmp" of="$$file" status=none && rm -f "$$tmp"; done'
+	@$(protoImage) sh -c 'find ./proto -name "*.proto" | while read -r file; do tmp=$$(mktemp /tmp/clang-format.XXXXXX); clang-format --style=file --assume-filename="$$file" "$$file" > "$$tmp" && dd if="$$tmp" of="$$file" status=none && rm -f "$$tmp"; done'
 
 proto-lint:
 	@$(protoImage) buf lint proto/ --error-format=json
