@@ -84,7 +84,7 @@ func (k Keeper) chargeForCreateDenom(ctx sdk.Context, creatorAddr string, _ stri
 			return err
 		}
 
-		if types.IsCapabilityEnabled(k.enabledCapabilities, types.EnableCommunityPoolFeeFunding) {
+		if k.IsCapabilityEnabled(types.EnableCommunityPoolFeeFunding) {
 			if err := k.communityPoolKeeper.FundCommunityPool(ctx, params.DenomCreationFee, accAddr); err != nil {
 				return err
 			}
