@@ -52,32 +52,34 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 	var err error
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	sudoEnabled := types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableSudoMint)
-	sa := SudoAdmins{Keeper: server.Keeper}
-	senderIsSudoAble := sa.IsSudoAdmin(goCtx, msg.Sender)
-	isSudo := sudoEnabled && senderIsSudoAble
-
-	if !isSudo {
-		// Standard user verification if they are not a Sudo admin
-		_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
-		if !denomExists {
-			return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
+	// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
+	if _, _, err = types.DeconstructDenom(msg.Amount.GetDenom()); err != nil {
+		sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
+		if !sudoEnabled {
+			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)
 		}
 
-		authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
-		if err != nil {
-			return nil, err
+		sa := SudoAdmins{Keeper: server.Keeper}
+		senderIsSudoAble := sa.IsSudoAdmin(goCtx, msg.Sender)
+		isSudo := sudoEnabled && senderIsSudoAble
+		if !isSudo {
+			return nil, types.ErrUnauthorized.Wrapf("the '%s' sender does NOT have sudo admin credentials", msg.Sender)
 		}
+	}
 
-		if msg.Sender != authorityMetadata.GetAdmin() {
-			return nil, types.ErrUnauthorized
-		}
+	// Denomination *MUST* already exist:
+	_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
+	if !denomExists {
+		return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
+	}
 
-		// verify that denom is an x/tokenfactory denom
-		_, _, err = types.DeconstructDenom(msg.Amount.GetDenom())
-		if err != nil {
-			return nil, err
-		}
+	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+	if err != nil {
+		return nil, err
+	}
+
+	if msg.Sender != authorityMetadata.GetAdmin() {
+		return nil, types.ErrUnauthorized
 	}
 
 	if msg.MintToAddress == "" {
@@ -111,31 +113,26 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		isBurningOwn = true
 	}
 
-	if !(isBurningOwn && types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableBurnOwn)) {
-		if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableBurnFrom) {
+	if !(isBurningOwn && server.IsCapabilityEnabled(types.EnableBurnOwn)) {
+		if !server.IsCapabilityEnabled(types.EnableBurnFrom) {
 			return nil, types.ErrCapabilityNotEnabled
 		}
 
-		sudoEnabled := types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableSudoMint)
-		sa := SudoAdmins{Keeper: server.Keeper}
-		senderIsSudoAble := sa.IsSudoAdmin(goCtx, msg.Sender)
-		isSudo := sudoEnabled && senderIsSudoAble
-
-		if !isSudo {
-			authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
-			if err != nil {
+		// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
+		if _, _, err := types.DeconstructDenom(msg.Amount.GetDenom()); err != nil {
+			sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
+			if !sudoEnabled {
 				return nil, err
 			}
+		}
 
-			if msg.Sender != authorityMetadata.GetAdmin() {
-				return nil, types.ErrUnauthorized
-			}
+		authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+		if err != nil {
+			return nil, err
+		}
 
-			// verify that denom is an x/tokenfactory denom
-			_, _, err = types.DeconstructDenom(msg.Amount.GetDenom())
-			if err != nil {
-				return nil, err
-			}
+		if msg.Sender != authorityMetadata.GetAdmin() {
+			return nil, types.ErrUnauthorized
 		}
 	}
 
@@ -158,7 +155,7 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 func (server msgServer) ForceTransfer(goCtx context.Context, msg *types.MsgForceTransfer) (*types.MsgForceTransferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableForceTransfer) {
+	if !server.IsCapabilityEnabled(types.EnableForceTransfer) {
 		return nil, types.ErrCapabilityNotEnabled
 	}
 
@@ -191,6 +188,11 @@ func (server msgServer) ForceTransfer(goCtx context.Context, msg *types.MsgForce
 func (server msgServer) ChangeAdmin(goCtx context.Context, msg *types.MsgChangeAdmin) (*types.MsgChangeAdminResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// verify that denom is an x/tokenfactory denom
+	if _, _, err := types.DeconstructDenom(msg.Denom); err != nil {
+		return nil, err
+	}
+
 	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Denom)
 	if err != nil {
 		return nil, err
@@ -218,13 +220,18 @@ func (server msgServer) ChangeAdmin(goCtx context.Context, msg *types.MsgChangeA
 func (server msgServer) SetDenomMetadata(goCtx context.Context, msg *types.MsgSetDenomMetadata) (*types.MsgSetDenomMetadataResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !types.IsCapabilityEnabled(server.Keeper.enabledCapabilities, types.EnableSetMetadata) {
+	if !server.IsCapabilityEnabled(types.EnableSetMetadata) {
 		return nil, types.ErrCapabilityNotEnabled
 	}
 
 	// Defense in depth validation of metadata
 	err := msg.Metadata.Validate()
 	if err != nil {
+		return nil, err
+	}
+
+	// verify that denom is an x/tokenfactory denom
+	if _, _, err := types.DeconstructDenom(msg.Metadata.Base); err != nil {
 		return nil, err
 	}
 
