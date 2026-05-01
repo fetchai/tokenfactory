@@ -216,6 +216,41 @@ func (suite *KeeperTestSuite) TestSetDenomMetaDataMsg() {
 	suite.SetupTest()
 	suite.CreateDefaultDenom()
 
+	admin2 := suite.TestAccs[1].String()
+
+	factoryDenom := fmt.Sprintf("factory/%s/unique", admin2)
+	nonFactoryDenom := "unique"
+
+	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
+	suite.Assert().NoError(suite.App.TokenFactoryKeeper.CreateDenomAfterValidation(ctx, admin2, nonFactoryDenom))
+	suite.Assert().NoError(suite.App.TokenFactoryKeeper.CreateDenomAfterValidation(ctx, admin2, factoryDenom))
+
+	// Proof, that both denoms have been correctly created and the `admin2` account is their admin:
+	res, _ := suite.App.TokenFactoryKeeper.DenomsFromAdmin(ctx, &types.QueryDenomsFromAdminRequest{Admin: admin2})
+	denoms := types.NewSet[string](res.GetDenoms()...)
+	suite.Assert().True(denoms.Contains(nonFactoryDenom))
+	suite.Assert().True(denoms.Contains(factoryDenom))
+
+	crateDenomMetadataMsg := func(admin string, fullDenom string) *types.MsgSetDenomMetadata {
+		return types.NewMsgSetDenomMetadata(admin2, banktypes.Metadata{
+			Description: "yeehaw",
+			DenomUnits: []*banktypes.DenomUnit{
+				{
+					Denom:    fullDenom,
+					Exponent: 0,
+				},
+				{
+					Denom:    "u" + fullDenom,
+					Exponent: 6,
+				},
+			},
+			Base:    fullDenom,
+			Display: fullDenom,
+			Name:    "UNIQUE",
+			Symbol:  "UNIQUE",
+		})
+	}
+
 	for _, tc := range []struct {
 		desc                  string
 		msgSetDenomMetadata   types.MsgSetDenomMetadata
@@ -265,11 +300,24 @@ func (suite *KeeperTestSuite) TestSetDenomMetaDataMsg() {
 			}),
 			expectedPass: false,
 		},
+		{
+			desc:                  "proving opposite scenario for the next test: setting denom metadata for factory-own denom passes",
+			msgSetDenomMetadata:   *crateDenomMetadataMsg(admin2, factoryDenom),
+			expectedPass:          true,
+			expectedMessageEvents: 1,
+		},
+		{
+			desc:                  "setting denom metadata for non-factory denom MUST fail",
+			msgSetDenomMetadata:   *crateDenomMetadataMsg(admin2, nonFactoryDenom),
+			expectedPass:          false,
+			expectedMessageEvents: 0,
+		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			tc := tc
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
+
 			// Test set denom metadata message
 			suite.msgServer.SetDenomMetadata(ctx, &tc.msgSetDenomMetadata) //nolint:errcheck
 			// Ensure current number and type of event is emitted
