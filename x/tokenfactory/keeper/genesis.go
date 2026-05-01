@@ -21,19 +21,12 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 		if err != nil {
 			panic(err)
 		}
-		err = k.createDenomAfterValidation(ctx, creator, genDenom.GetDenom())
+		err = k.CreateDenomAfterValidation(ctx, creator, genDenom.GetDenom())
 		if err != nil {
 			panic(err)
 		}
 		err = k.setAuthorityMetadata(ctx, genDenom.GetDenom(), genDenom.GetAuthorityMetadata())
 		if err != nil {
-			panic(err)
-		}
-	}
-
-	sa := SudoAdmins{Keeper: k}
-	for _, genAdmin := range genState.GetSudoAdmins() {
-		if err := sa.AddSudoAdmin(ctx, genAdmin); err != nil {
 			panic(err)
 		}
 	}
@@ -58,11 +51,8 @@ func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 		})
 	}
 
-	sa := SudoAdmins{Keeper: k}
-
 	return &types.GenesisState{
 		FactoryDenoms: genDenoms,
 		Params:        k.GetParams(ctx),
-		SudoAdmins:    sa.GetAllSudoAdmins(ctx),
 	}
 }

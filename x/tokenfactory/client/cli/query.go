@@ -26,8 +26,6 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdDenomAuthorityMetadata(),
 		GetCmdDenomsFromCreator(),
 		GetCmdDenomsFromAdmin(),
-		GetCmdIsSudoAdmin(),
-		GetCmdSudoAdmins(),
 	)
 
 	return cmd
@@ -133,60 +131,6 @@ func GetCmdDenomsFromAdmin() *cobra.Command {
 			res, err := queryClient.DenomsFromAdmin(cmd.Context(), &types.QueryDenomsFromAdminRequest{
 				Admin: args[0],
 			})
-			if err != nil {
-				return err
-			}
-
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func GetCmdIsSudoAdmin() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "is-sudo-admin [address] [flags]",
-		Short: "Checks whether an address is registered as a sudo admin",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
-			if err != nil {
-				return err
-			}
-			queryClient := types.NewQueryClient(clientCtx)
-
-			res, err := queryClient.IsSudoAdmin(cmd.Context(), &types.QueryIsSudoAdminRequest{
-				Address: args[0],
-			})
-			if err != nil {
-				return err
-			}
-
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func GetCmdSudoAdmins() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "sudo-admins [flags]",
-		Short: "Returns all registered sudo admin addresses",
-		Args:  cobra.ExactArgs(0),
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
-			if err != nil {
-				return err
-			}
-			queryClient := types.NewQueryClient(clientCtx)
-
-			res, err := queryClient.SudoAdmins(cmd.Context(), &types.QuerySudoAdminsRequest{})
 			if err != nil {
 				return err
 			}

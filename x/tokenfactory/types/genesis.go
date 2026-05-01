@@ -16,7 +16,6 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Params:        DefaultParams(),
 		FactoryDenoms: []GenesisDenom{},
-		SudoAdmins:    []string{},
 	}
 }
 
@@ -29,17 +28,14 @@ func (gs GenesisState) Validate() error {
 	}
 
 	seenDenoms := NewSet[string]()
-	seenSudoAdmins := NewSet[string]()
-
 	for _, denom := range gs.GetFactoryDenoms() {
 		if seenDenoms.Contains(denom.GetDenom()) {
 			return errorsmod.Wrapf(ErrInvalidGenesis, "duplicate denom: %s", denom.GetDenom())
 		}
-		seenDenoms.Add(denom.GetDenom())
 
-		_, _, err := DeconstructDenom(denom.GetDenom())
-		if err != nil {
-			return err
+		seenDenoms.Add(denom.GetDenom())
+		if err = sdk.ValidateDenom(denom.GetDenom()); err != nil {
+			return errorsmod.Wrapf(ErrInvalidGenesis, "invalid denom: %s", denom.GetDenom())
 		}
 
 		if denom.AuthorityMetadata.Admin != "" {
@@ -49,17 +45,5 @@ func (gs GenesisState) Validate() error {
 			}
 		}
 	}
-
-	for _, sudoAdmin := range gs.GetSudoAdmins() {
-		if seenSudoAdmins.Contains(sudoAdmin) {
-			return errorsmod.Wrapf(ErrInvalidGenesis, "duplicate sudo admin: %s", sudoAdmin)
-		}
-		seenSudoAdmins.Add(sudoAdmin)
-
-		if _, err := sdk.AccAddressFromBech32(sudoAdmin); err != nil {
-			return errorsmod.Wrapf(ErrInvalidGenesis, "invalid sudo admin address (%s)", err)
-		}
-	}
-
 	return nil
 }

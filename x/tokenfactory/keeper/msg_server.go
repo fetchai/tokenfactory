@@ -58,13 +58,6 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 		if !sudoEnabled {
 			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)
 		}
-
-		sa := SudoAdmins{Keeper: server.Keeper}
-		senderIsSudoAble := sa.IsSudoAdmin(goCtx, msg.Sender)
-		isSudo := sudoEnabled && senderIsSudoAble
-		if !isSudo {
-			return nil, types.ErrUnauthorized.Wrapf("the '%s' sender does NOT have sudo admin credentials", msg.Sender)
-		}
 	}
 
 	// Denomination *MUST* already exist:
@@ -115,14 +108,14 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 
 	if !(isBurningOwn && server.IsCapabilityEnabled(types.EnableBurnOwn)) {
 		if !server.IsCapabilityEnabled(types.EnableBurnFrom) {
-			return nil, types.ErrCapabilityNotEnabled
+			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableBurnFrom)
 		}
 
 		// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
 		if _, _, err := types.DeconstructDenom(msg.Amount.GetDenom()); err != nil {
 			sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
 			if !sudoEnabled {
-				return nil, err
+				return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)
 			}
 		}
 
@@ -132,7 +125,7 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		}
 
 		if msg.Sender != authorityMetadata.GetAdmin() {
-			return nil, types.ErrUnauthorized
+			return nil, types.ErrUnauthorized.Wrapf("the '%s' sender is NOT '%s' admin of the '%s' denomination", msg.Sender, authorityMetadata.GetAdmin(), msg.Amount.GetDenom())
 		}
 	}
 

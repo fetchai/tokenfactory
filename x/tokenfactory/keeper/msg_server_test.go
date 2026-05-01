@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -16,6 +15,9 @@ import (
 func (suite *KeeperTestSuite) TestMintDenomMsg() {
 	// Create a denom
 	suite.CreateDefaultDenom()
+	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
+	nonFactoryDenom := "unique"
+	suite.App.TokenFactoryKeeper.CreateDenomAfterValidation(ctx, suite.TestAccs[0].String(), nonFactoryDenom)
 
 	for _, tc := range []struct {
 		desc                  string
@@ -38,36 +40,32 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 			sender:                suite.TestAccs[0].String(),
 			expectedMessageEvents: 1,
 		},
+		{
+			desc:                  "invalid mint from non admin for factory-own denom",
+			amount:                10,
+			mintDenom:             suite.defaultDenom,
+			sender:                suite.TestAccs[1].String(),
+			expectedMessageEvents: 0,
+		},
 		// Sudo Mints
 		{
-			desc:                  "successful sudo mint executed by an allowed sudoer",
+			desc:                  "successful mint of *NON* factory-own denom by non admin",
 			amount:                10,
-			mintDenom:             "unique",
+			mintDenom:             nonFactoryDenom,
 			sender:                suite.TestAccs[0].String(),
-			sudoer:                suite.TestAccs[0].String(), // this user can sudo mint
 			expectedMessageEvents: 1,
 		},
 		{
-			desc:                  "invalid sudo mint from a non admin",
+			desc:                  "invalid mint of *NON* factory-own denom by non admin",
 			amount:                10,
-			mintDenom:             "unique",
-			sender:                suite.TestAccs[0].String(),
-			sudoer:                suite.TestAccs[1].String(),
+			mintDenom:             nonFactoryDenom,
+			sender:                suite.TestAccs[1].String(),
 			expectedMessageEvents: 0,
 		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
-
-			sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
-			if tc.sudoer != "" {
-				suite.NoError(sa.AddSudoAdmin(suite.Ctx, tc.sudoer))
-
-				defer func() {
-					suite.NoError(sa.RemoveSudoAdmin(suite.Ctx, tc.sudoer))
-				}()
-			}
 
 			suite.OverrideMsgServer(suite.App.TokenFactoryKeeper)
 

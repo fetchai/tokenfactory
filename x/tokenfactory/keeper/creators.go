@@ -18,7 +18,7 @@ func (k Keeper) GetDenomsFromCreator(ctx context.Context, creator string) []stri
 	iterator := store.Iterator(nil, nil)
 	defer iterator.Close()
 
-	denoms := []string{}
+	var denoms []string
 	for ; iterator.Valid(); iterator.Next() {
 		denoms = append(denoms, string(iterator.Key()))
 	}

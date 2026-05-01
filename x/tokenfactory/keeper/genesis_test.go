@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -30,10 +29,6 @@ func (suite *KeeperTestSuite) TestGenesis() {
 				},
 			},
 		},
-		SudoAdmins: []string{
-			"cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
-			"cosmos15czt5nhlnvayqq37xun9s9yus0d6y26dx74r5p",
-		},
 	}
 
 	suite.SetupTestForInitGenesis()
@@ -55,19 +50,4 @@ func (suite *KeeperTestSuite) TestGenesis() {
 	exportedGenesis := app.TokenFactoryKeeper.ExportGenesis(suite.Ctx)
 	suite.Require().NotNil(exportedGenesis)
 	suite.Require().Equal(genesisState, *exportedGenesis)
-}
-
-func (suite *KeeperTestSuite) TestGenesisStoresSudoAdmins() {
-	genesisState := types.GenesisState{
-		SudoAdmins: []string{
-			suite.TestAccs[0].String(),
-			suite.TestAccs[1].String(),
-		},
-	}
-
-	sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
-	suite.App.TokenFactoryKeeper.InitGenesis(suite.Ctx, genesisState)
-
-	suite.Require().True(sa.IsSudoAdmin(suite.Ctx, suite.TestAccs[0].String()))
-	suite.Require().True(sa.IsSudoAdmin(suite.Ctx, suite.TestAccs[1].String()))
 }

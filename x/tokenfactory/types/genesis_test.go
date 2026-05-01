@@ -85,36 +85,6 @@ func TestGenesisState_Validate(t *testing.T) {
 			},
 			valid: false,
 		},
-
-		{
-			desc: "valid sudo admins",
-			genState: &types.GenesisState{
-				SudoAdmins: []string{
-					"cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
-					"cosmos15czt5nhlnvayqq37xun9s9yus0d6y26dx74r5p",
-				},
-			},
-			valid: true,
-		},
-		{
-			desc: "invalid sudo admin",
-			genState: &types.GenesisState{
-				SudoAdmins: []string{
-					"moose",
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicate sudo admin",
-			genState: &types.GenesisState{
-				SudoAdmins: []string{
-					"cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
-					"cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
-				},
-			},
-			valid: false,
-		},
 		{
 			desc: "multiple denoms",
 			genState: &types.GenesisState{
@@ -149,6 +119,62 @@ func TestGenesisState_Validate(t *testing.T) {
 						Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/bitcoin",
 						AuthorityMetadata: types.DenomAuthorityMetadata{
 							Admin: "",
+						},
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "different admin from creator",
+			genState: &types.GenesisState{
+				FactoryDenoms: []types.GenesisDenom{
+					{
+						Denom: "stake",
+						AuthorityMetadata: types.DenomAuthorityMetadata{
+							Admin: "cosmos1ft6e5esdtdegnvcr3djd3ftk4kwpcr6jta8eyh",
+						},
+					},
+				},
+			},
+			valid: true,
+		},
+		{
+			desc: "different admin from creator",
+			genState: &types.GenesisState{
+				FactoryDenoms: []types.GenesisDenom{
+					{
+						Denom: "st",
+						AuthorityMetadata: types.DenomAuthorityMetadata{
+							Admin: "cosmos1ft6e5esdtdegnvcr3djd3ftk4kwpcr6jta8eyh",
+						},
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "different admin from creator",
+			genState: &types.GenesisState{
+				FactoryDenoms: []types.GenesisDenom{
+					{
+						Denom: "a0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456",
+						AuthorityMetadata: types.DenomAuthorityMetadata{
+							Admin: "cosmos1ft6e5esdtdegnvcr3djd3ftk4kwpcr6jta8eyh",
+						},
+					},
+				},
+			},
+			valid: true,
+		},
+		{
+			desc: "different admin from creator",
+			genState: &types.GenesisState{
+				FactoryDenoms: []types.GenesisDenom{
+					{
+						Denom: "a01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567",
+						AuthorityMetadata: types.DenomAuthorityMetadata{
+							Admin: "cosmos1ft6e5esdtdegnvcr3djd3ftk4kwpcr6jta8eyh",
 						},
 					},
 				},
