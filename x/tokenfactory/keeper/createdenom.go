@@ -52,6 +52,26 @@ func (k Keeper) CreateDenomAfterValidation(ctx sdk.Context, creatorAddr string, 
 	return nil
 }
 
+// RegisterExistingDenomAuthority registers authority metadata for an existing denom
+// and indexes it under the admin address.
+//
+// This is intended for denoms that already exist outside the normal tokenfactory
+// CreateDenom flow, such as native staking denoms.
+// It does not set bank metadata and does not perform tokenfactory denom creation
+// or validation.
+func (k Keeper) RegisterExistingDenomAuthority(ctx sdk.Context, adminAddr string, denom string) error {
+	authorityMetadata := types.DenomAuthorityMetadata{
+		Admin: adminAddr,
+	}
+
+	if err := k.setAuthorityMetadata(ctx, denom, authorityMetadata); err != nil {
+		return err
+	}
+
+	k.addDenomFromCreator(ctx, adminAddr, denom)
+	return nil
+}
+
 func (k Keeper) validateCreateDenom(ctx sdk.Context, creatorAddr string, subdenom string) (newTokenDenom string, err error) {
 	// TODO: This was a nil key on Store issue. Removed as we are upgrading IBC versions now
 	// Temporary check until IBC bug is sorted out
