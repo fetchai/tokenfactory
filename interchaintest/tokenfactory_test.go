@@ -1,3 +1,15 @@
+//go:build disabled
+
+// TODO(pb): The test shall be re-enabled once the issue with the strangelove-ventures/interchaintest module is resolved.
+// Disabling due to dual import of ibc-go module v8@v8.4.0 and v10@v10.3.0, what causes conflicts when each version
+// of ibc-go module registers the very same set of errors in the *GLOBAL* scope via `errorsmod.Register(...)`.
+// This happens due to the fact, that this particular test depends on the
+// strangelove-ventures/interchaintest/v8@v8.8.1 module, which depends on ibc-go/v8@v8.4.0, however our
+// fetchai/tokenfactory depends on ibc-go/v10@v10.3.0.
+// At the moment, this is hard to resolve, since the strangelove-ventures/interchaintest would need to be forked,
+// and updated so it would depend on CosmWasm/wasmd@v0.61.2, CosmWasm/wasmvm/v3@v3.0.0 and ibc-go/v10@v10.3.0,
+// what is non-trivial task, hence disabling this test temporarily.
+
 package interchaintest
 
 import (
