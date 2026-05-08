@@ -4,13 +4,13 @@ import (
 	"context"
 	"math/rand"
 
-	appparams "github.com/strangelove-ventures/tokenfactory/app/params"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdkmath "cosmossdk.io/math"
 	sdkstore "cosmossdk.io/store"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -101,6 +101,7 @@ func WeightedOperations(
 		simulation.NewWeightedOperation(
 			weightMsgCreateDenom,
 			SimulateMsgCreateDenom(
+				simstate.TxConfig,
 				tfKeeper,
 				ak,
 				bk,
@@ -109,6 +110,7 @@ func WeightedOperations(
 		simulation.NewWeightedOperation(
 			weightMsgMint,
 			SimulateMsgMint(
+				simstate.TxConfig,
 				tfKeeper,
 				ak,
 				bk,
@@ -118,6 +120,7 @@ func WeightedOperations(
 		simulation.NewWeightedOperation(
 			weightMsgBurn,
 			SimulateMsgBurn(
+				simstate.TxConfig,
 				tfKeeper,
 				ak,
 				bk,
@@ -127,6 +130,7 @@ func WeightedOperations(
 		simulation.NewWeightedOperation(
 			weightMsgChangeAdmin,
 			SimulateMsgChangeAdmin(
+				simstate.TxConfig,
 				tfKeeper,
 				ak,
 				bk,
@@ -136,6 +140,7 @@ func WeightedOperations(
 		simulation.NewWeightedOperation(
 			weightMsgSetDenomMetadata,
 			SimulateMsgSetDenomMetadata(
+				simstate.TxConfig,
 				tfKeeper,
 				ak,
 				bk,
@@ -158,6 +163,7 @@ func DefaultSimulationDenomSelector(r *rand.Rand, ctx sdk.Context, tfKeeper Toke
 }
 
 func SimulateMsgSetDenomMetadata(
+	txGen client.TxConfig,
 	tfKeeper TokenfactoryKeeper,
 	ak types.AccountKeeper,
 	bk BankKeeper,
@@ -208,12 +214,13 @@ func SimulateMsgSetDenomMetadata(
 			Metadata: metadata,
 		}
 
-		txCtx := BuildOperationInput(r, app, ctx, &msg, adminAccount, ak, bk, nil)
+		txCtx := BuildOperationInput(r, app, txGen, ctx, &msg, adminAccount, ak, bk, nil)
 		return simulation.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
 func SimulateMsgChangeAdmin(
+	txGen client.TxConfig,
 	tfKeeper TokenfactoryKeeper,
 	ak types.AccountKeeper,
 	bk BankKeeper,
@@ -259,12 +266,13 @@ func SimulateMsgChangeAdmin(
 			NewAdmin: newAdmin.Address.String(),
 		}
 
-		txCtx := BuildOperationInput(r, app, ctx, &msg, curAdminAccount, ak, bk, nil)
+		txCtx := BuildOperationInput(r, app, txGen, ctx, &msg, curAdminAccount, ak, bk, nil)
 		return simulation.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
 func SimulateMsgBurn(
+	txGen client.TxConfig,
 	tfKeeper TokenfactoryKeeper,
 	ak types.AccountKeeper,
 	bk BankKeeper,
@@ -314,13 +322,14 @@ func SimulateMsgBurn(
 			Amount: burnAmount,
 		}
 
-		txCtx := BuildOperationInput(r, app, ctx, &msg, adminAccount, ak, bk, sdk.NewCoins(burnAmount))
+		txCtx := BuildOperationInput(r, app, txGen, ctx, &msg, adminAccount, ak, bk, sdk.NewCoins(burnAmount))
 		return simulation.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
 // Simulate msg mint denom
 func SimulateMsgMint(
+	txGen client.TxConfig,
 	tfKeeper TokenfactoryKeeper,
 	ak types.AccountKeeper,
 	bk BankKeeper,
@@ -363,13 +372,13 @@ func SimulateMsgMint(
 			Amount: sdk.NewCoin(denom, mintAmount),
 		}
 
-		txCtx := BuildOperationInput(r, app, ctx, &msg, adminAccount, ak, bk, nil)
+		txCtx := BuildOperationInput(r, app, txGen, ctx, &msg, adminAccount, ak, bk, nil)
 		return simulation.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
 
 // Simulate msg create denom
-func SimulateMsgCreateDenom(tfKeeper TokenfactoryKeeper, ak types.AccountKeeper, bk BankKeeper) simtypes.Operation {
+func SimulateMsgCreateDenom(txGen client.TxConfig, tfKeeper TokenfactoryKeeper, ak types.AccountKeeper, bk BankKeeper) simtypes.Operation {
 	return func(
 		r *rand.Rand,
 		app *baseapp.BaseApp,
@@ -395,7 +404,7 @@ func SimulateMsgCreateDenom(tfKeeper TokenfactoryKeeper, ak types.AccountKeeper,
 			Subdenom: simtypes.RandStringOfLength(r, 10),
 		}
 
-		txCtx := BuildOperationInput(r, app, ctx, &msg, simAccount, ak, bk, createFee)
+		txCtx := BuildOperationInput(r, app, txGen, ctx, &msg, simAccount, ak, bk, createFee)
 		return simulation.GenAndDeliverTxWithRandFees(txCtx)
 	}
 }
@@ -404,6 +413,7 @@ func SimulateMsgCreateDenom(tfKeeper TokenfactoryKeeper, ak types.AccountKeeper,
 func BuildOperationInput(
 	r *rand.Rand,
 	app *baseapp.BaseApp,
+	txGen client.TxConfig,
 	ctx sdk.Context,
 	msg interface {
 		sdk.Msg
@@ -417,7 +427,7 @@ func BuildOperationInput(
 	return simulation.OperationInput{
 		R:               r,
 		App:             app,
-		TxGen:           appparams.MakeEncodingConfig().TxConfig,
+		TxGen:           txGen,
 		Cdc:             nil,
 		Msg:             msg,
 		Context:         ctx,
