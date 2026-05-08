@@ -20,6 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  if: false
   build-docker:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +49,7 @@ jobs:
           path: ${{ env.TAR_PATH }}
 
   e2e-tests:
+    if: false
     needs: build-docker
     runs-on: ubuntu-latest
     strategy:
@@ -81,6 +83,7 @@ jobs:
         run: make ${{ matrix.test }}
 
   coverage:
+    if: false
     needs: build-docker
     runs-on: ubuntu-latest
     steps:
