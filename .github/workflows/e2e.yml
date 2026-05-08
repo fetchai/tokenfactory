@@ -20,8 +20,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  if: false
   build-docker:
+    if: ${{ always() && false }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,7 +49,7 @@ jobs:
           path: ${{ env.TAR_PATH }}
 
   e2e-tests:
-    if: false
+    if: ${{ always() && false }}
     needs: build-docker
     runs-on: ubuntu-latest
     strategy:
@@ -83,7 +83,7 @@ jobs:
         run: make ${{ matrix.test }}
 
   coverage:
-    if: false
+    if: ${{ always() && false }}
     needs: build-docker
     runs-on: ubuntu-latest
     steps:
