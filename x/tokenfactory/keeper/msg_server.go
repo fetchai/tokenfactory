@@ -53,17 +53,17 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
-	if _, _, err = types.DeconstructDenom(msg.Amount.GetDenom()); err != nil {
+	if _, _, err = types.DeconstructDenom(msg.Amount.GetDenom()); err == nil {
+		// Denomination *MUST* already exist:
+		_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
+		if !denomExists {
+			return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
+		}
+	} else {
 		sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
 		if !sudoEnabled {
 			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)
 		}
-	}
-
-	// Denomination *MUST* already exist:
-	_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
-	if !denomExists {
-		return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
 	}
 
 	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
@@ -112,7 +112,13 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		}
 
 		// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
-		if _, _, err := types.DeconstructDenom(msg.Amount.GetDenom()); err != nil {
+		if _, _, err := types.DeconstructDenom(msg.Amount.GetDenom()); err == nil {
+			// Denomination *MUST* already exist:
+			_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
+			if !denomExists {
+				return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
+			}
+		} else {
 			sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
 			if !sudoEnabled {
 				return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)

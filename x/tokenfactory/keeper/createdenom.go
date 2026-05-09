@@ -1,10 +1,14 @@
 package keeper
 
 import (
-	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
+)
+
+var (
+	moduleAddress = authtypes.NewModuleAddress(types.ModuleName).String()
 )
 
 // ConvertToBaseToken converts a fee amount in a whitelisted fee token to the base fee token amount
@@ -19,47 +23,33 @@ func (k Keeper) CreateDenom(ctx sdk.Context, creatorAddr string, subdenom string
 		return "", err
 	}
 
-	err = k.CreateDenomAfterValidation(ctx, creatorAddr, denom)
+	err = k.createDenomAfterValidation(ctx, creatorAddr, denom)
 	return denom, err
 }
 
 // Runs CreateDenom logic after the charge and all denom validation has been handled.
 // Made into a second function for genesis initialization.
-func (k Keeper) CreateDenomAfterValidation(ctx sdk.Context, creatorAddr string, denom string) (err error) {
-	denomMetaData := banktypes.Metadata{
-		DenomUnits: []*banktypes.DenomUnit{{
-			Denom:    denom,
-			Exponent: 0,
-		}},
-		Base: denom,
-		// The following is necessary for x/bank denom validation
-		Display: denom,
-		Name:    denom,
-		Symbol:  denom,
+func (k Keeper) createDenomAfterValidation(ctx sdk.Context, adminAddr string, denom string) (err error) {
+	// Set Bank Denom Metadata *only IF* the denom is tokenfactory-bound:
+	var creatorAddr string
+	if creatorAddr, _, err = types.DeconstructDenom(denom); err == nil {
+		denomMetaData := banktypes.Metadata{
+			DenomUnits: []*banktypes.DenomUnit{{
+				Denom:    denom,
+				Exponent: 0,
+			}},
+			Base: denom,
+			// The following is necessary for x/bank denom validation
+			Display: denom,
+			Name:    denom,
+			Symbol:  denom,
+		}
+
+		k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
+	} else {
+		creatorAddr = moduleAddress
 	}
 
-	k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
-
-	authorityMetadata := types.DenomAuthorityMetadata{
-		Admin: creatorAddr,
-	}
-	err = k.setAuthorityMetadata(ctx, denom, authorityMetadata)
-	if err != nil {
-		return err
-	}
-
-	k.addDenomFromCreator(ctx, creatorAddr, denom)
-	return nil
-}
-
-// RegisterExistingDenomAuthority registers authority metadata for an existing denom
-// and indexes it under the admin address.
-//
-// This is intended for denoms that already exist outside the normal tokenfactory
-// CreateDenom flow, such as native staking denoms.
-// It does not set bank metadata and does not perform tokenfactory denom creation
-// or validation.
-func (k Keeper) RegisterExistingDenomAuthority(ctx sdk.Context, adminAddr string, denom string) error {
 	authorityMetadata := types.DenomAuthorityMetadata{
 		Admin: adminAddr,
 	}
@@ -68,7 +58,7 @@ func (k Keeper) RegisterExistingDenomAuthority(ctx sdk.Context, adminAddr string
 		return err
 	}
 
-	k.addDenomFromCreator(ctx, adminAddr, denom)
+	k.addDenomFromCreator(ctx, creatorAddr, denom)
 	return nil
 }
 

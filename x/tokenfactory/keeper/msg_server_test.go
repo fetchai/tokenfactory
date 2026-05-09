@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
+	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -17,7 +18,8 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 	suite.CreateDefaultDenom()
 	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 	nonFactoryDenom := "unique"
-	suite.App.TokenFactoryKeeper.CreateDenomAfterValidation(ctx, suite.TestAccs[0].String(), nonFactoryDenom)
+	udc := keeper.NewUnboundDenomCreator(suite.App.TokenFactoryKeeper)
+	udc.CreateDenom(ctx, suite.TestAccs[0].String(), nonFactoryDenom)
 
 	for _, tc := range []struct {
 		desc                  string
@@ -216,14 +218,20 @@ func (suite *KeeperTestSuite) TestSetDenomMetaDataMsg() {
 	suite.SetupTest()
 	suite.CreateDefaultDenom()
 
+	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
+
 	admin2 := suite.TestAccs[1].String()
 
-	factoryDenom := fmt.Sprintf("factory/%s/unique", admin2)
 	nonFactoryDenom := "unique"
+	udc := keeper.NewUnboundDenomCreator(suite.App.TokenFactoryKeeper)
+	suite.Assert().NoError(udc.CreateDenom(ctx, admin2, nonFactoryDenom))
 
-	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
-	suite.Assert().NoError(suite.App.TokenFactoryKeeper.CreateDenomAfterValidation(ctx, admin2, nonFactoryDenom))
-	suite.Assert().NoError(suite.App.TokenFactoryKeeper.CreateDenomAfterValidation(ctx, admin2, factoryDenom))
+	factoryDenom, err := suite.App.TokenFactoryKeeper.CreateDenom(ctx, admin2, nonFactoryDenom)
+	suite.Assert().NoError(err)
+
+	//expectedFactoryDenom, err := types.GetTokenDenom(admin2, nonFactoryDenom)
+	//suite.Assert().NoError(err)
+	//suite.Assert().Equal(factoryDenom, expectedFactoryDenom)
 
 	// Proof, that both denoms have been correctly created and the `admin2` account is their admin:
 	res, _ := suite.App.TokenFactoryKeeper.DenomsFromAdmin(ctx, &types.QueryDenomsFromAdminRequest{Admin: admin2})

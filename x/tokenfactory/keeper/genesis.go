@@ -17,15 +17,7 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	}
 
 	for _, genDenom := range genState.GetFactoryDenoms() {
-		creator, _, err := types.DeconstructDenom(genDenom.GetDenom())
-		if err != nil {
-			panic(err)
-		}
-		err = k.CreateDenomAfterValidation(ctx, creator, genDenom.GetDenom())
-		if err != nil {
-			panic(err)
-		}
-		err = k.setAuthorityMetadata(ctx, genDenom.GetDenom(), genDenom.GetAuthorityMetadata())
+		err := k.createDenomAfterValidation(ctx, genDenom.GetAuthorityMetadata().Admin, genDenom.GetDenom())
 		if err != nil {
 			panic(err)
 		}
