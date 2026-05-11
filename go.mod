@@ -1,6 +1,6 @@
 module github.com/strangelove-ventures/tokenfactory
 
-go 1.24.1
+go 1.24.0
 
 replace (
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0 // v1.18+ breaks app overrides
