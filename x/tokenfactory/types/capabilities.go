@@ -16,17 +16,3 @@ const (
 	// This is useful for ICS chains, or networks who wish to just have the fee tokens burned (not gas fees, just the extra on top).
 	EnableCommunityPoolFeeFunding = "enable_community_pool_fee_funding"
 )
-
-func IsCapabilityEnabled(enabledCapabilities []string, capability string) bool {
-	if len(enabledCapabilities) == 0 {
-		return false
-	}
-
-	for _, v := range enabledCapabilities {
-		if v == capability {
-			return true
-		}
-	}
-
-	return false
-}

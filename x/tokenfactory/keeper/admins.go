@@ -51,7 +51,7 @@ func (k Keeper) GetDenomsFromAdmin(ctx context.Context, admin string) ([]string,
 	iterator := k.GetAllDenomsIterator(ctx)
 	defer iterator.Close()
 
-	denoms := []string{}
+	var denoms []string
 	for ; iterator.Valid(); iterator.Next() {
 		denom := string(iterator.Value())
 		metadata, err := k.GetAuthorityMetadata(sdk.UnwrapSDKContext(ctx), denom)

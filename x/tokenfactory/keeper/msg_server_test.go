@@ -16,6 +16,10 @@ import (
 func (suite *KeeperTestSuite) TestMintDenomMsg() {
 	// Create a denom
 	suite.CreateDefaultDenom()
+	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
+	nonFactoryDenom := "unique"
+	udc := keeper.NewUnboundDenomCreator(suite.App.TokenFactoryKeeper)
+	udc.CreateDenom(ctx, suite.TestAccs[0].String(), nonFactoryDenom)
 
 	for _, tc := range []struct {
 		desc                  string
@@ -38,36 +42,32 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 			sender:                suite.TestAccs[0].String(),
 			expectedMessageEvents: 1,
 		},
+		{
+			desc:                  "invalid mint from non admin for factory-own denom",
+			amount:                10,
+			mintDenom:             suite.defaultDenom,
+			sender:                suite.TestAccs[1].String(),
+			expectedMessageEvents: 0,
+		},
 		// Sudo Mints
 		{
-			desc:                  "successful sudo mint executed by an allowed sudoer",
+			desc:                  "successful mint of *NON* factory-own denom by non admin",
 			amount:                10,
-			mintDenom:             "unique",
+			mintDenom:             nonFactoryDenom,
 			sender:                suite.TestAccs[0].String(),
-			sudoer:                suite.TestAccs[0].String(), // this user can sudo mint
 			expectedMessageEvents: 1,
 		},
 		{
-			desc:                  "invalid sudo mint from a non admin",
+			desc:                  "invalid mint of *NON* factory-own denom by non admin",
 			amount:                10,
-			mintDenom:             "unique",
-			sender:                suite.TestAccs[0].String(),
-			sudoer:                suite.TestAccs[1].String(),
+			mintDenom:             nonFactoryDenom,
+			sender:                suite.TestAccs[1].String(),
 			expectedMessageEvents: 0,
 		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
-
-			sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
-			if tc.sudoer != "" {
-				suite.NoError(sa.AddSudoAdmin(suite.Ctx, tc.sudoer))
-
-				defer func() {
-					suite.NoError(sa.RemoveSudoAdmin(suite.Ctx, tc.sudoer))
-				}()
-			}
 
 			suite.OverrideMsgServer(suite.App.TokenFactoryKeeper)
 
@@ -218,6 +218,47 @@ func (suite *KeeperTestSuite) TestSetDenomMetaDataMsg() {
 	suite.SetupTest()
 	suite.CreateDefaultDenom()
 
+	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
+
+	admin2 := suite.TestAccs[1].String()
+
+	nonFactoryDenom := "unique"
+	udc := keeper.NewUnboundDenomCreator(suite.App.TokenFactoryKeeper)
+	suite.Assert().NoError(udc.CreateDenom(ctx, admin2, nonFactoryDenom))
+
+	factoryDenom, err := suite.App.TokenFactoryKeeper.CreateDenom(ctx, admin2, nonFactoryDenom)
+	suite.Assert().NoError(err)
+
+	//expectedFactoryDenom, err := types.GetTokenDenom(admin2, nonFactoryDenom)
+	//suite.Assert().NoError(err)
+	//suite.Assert().Equal(factoryDenom, expectedFactoryDenom)
+
+	// Proof, that both denoms have been correctly created and the `admin2` account is their admin:
+	res, _ := suite.App.TokenFactoryKeeper.DenomsFromAdmin(ctx, &types.QueryDenomsFromAdminRequest{Admin: admin2})
+	denoms := types.NewSet[string](res.GetDenoms()...)
+	suite.Assert().True(denoms.Contains(nonFactoryDenom))
+	suite.Assert().True(denoms.Contains(factoryDenom))
+
+	crateDenomMetadataMsg := func(admin string, fullDenom string) *types.MsgSetDenomMetadata {
+		return types.NewMsgSetDenomMetadata(admin2, banktypes.Metadata{
+			Description: "yeehaw",
+			DenomUnits: []*banktypes.DenomUnit{
+				{
+					Denom:    fullDenom,
+					Exponent: 0,
+				},
+				{
+					Denom:    "u" + fullDenom,
+					Exponent: 6,
+				},
+			},
+			Base:    fullDenom,
+			Display: fullDenom,
+			Name:    "UNIQUE",
+			Symbol:  "UNIQUE",
+		})
+	}
+
 	for _, tc := range []struct {
 		desc                  string
 		msgSetDenomMetadata   types.MsgSetDenomMetadata
@@ -267,11 +308,24 @@ func (suite *KeeperTestSuite) TestSetDenomMetaDataMsg() {
 			}),
 			expectedPass: false,
 		},
+		{
+			desc:                  "proving opposite scenario for the next test: setting denom metadata for factory-own denom passes",
+			msgSetDenomMetadata:   *crateDenomMetadataMsg(admin2, factoryDenom),
+			expectedPass:          true,
+			expectedMessageEvents: 1,
+		},
+		{
+			desc:                  "setting denom metadata for non-factory denom MUST fail",
+			msgSetDenomMetadata:   *crateDenomMetadataMsg(admin2, nonFactoryDenom),
+			expectedPass:          false,
+			expectedMessageEvents: 0,
+		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
 			tc := tc
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
+
 			// Test set denom metadata message
 			suite.msgServer.SetDenomMetadata(ctx, &tc.msgSetDenomMetadata) //nolint:errcheck
 			// Ensure current number and type of event is emitted

@@ -24,7 +24,7 @@ type (
 		bankKeeper          types.BankKeeper
 		communityPoolKeeper types.CommunityPoolKeeper
 
-		enabledCapabilities []string
+		enabledCapabilities *types.Set[string]
 
 		// the address capable of executing a MsgUpdateParams message. Typically, this
 		// should be the x/gov module account.
@@ -59,7 +59,7 @@ func NewKeeper(
 
 		authority: authority,
 
-		enabledCapabilities: enabledCapabilities,
+		enabledCapabilities: types.NewSet[string](enabledCapabilities...),
 	}
 
 	return k
@@ -71,11 +71,11 @@ func (k Keeper) GetAuthority() string {
 }
 
 func (k Keeper) GetEnabledCapabilities() []string {
-	return k.enabledCapabilities
+	return k.enabledCapabilities.ToSlice()
 }
 
 func (k *Keeper) SetEnabledCapabilities(_ sdk.Context, newCapabilities []string) {
-	k.enabledCapabilities = newCapabilities
+	k.enabledCapabilities = types.NewSet[string](newCapabilities...)
 }
 
 // Logger returns a logger for the x/tokenfactory module
@@ -99,4 +99,8 @@ func (k Keeper) GetCreatorPrefixStore(ctx sdk.Context, creator string) store.KVS
 func (k Keeper) GetCreatorsPrefixStore(ctx sdk.Context) store.KVStore {
 	store := ctx.KVStore(k.storeKey)
 	return prefix.NewStore(store, types.GetCreatorsPrefix())
+}
+
+func (k Keeper) IsCapabilityEnabled(capability string) bool {
+	return k.enabledCapabilities.Contains(capability)
 }

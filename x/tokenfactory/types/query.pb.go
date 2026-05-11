@@ -388,182 +388,6 @@ func (m *QueryDenomsFromAdminResponse) GetDenoms() []string {
 	return nil
 }
 
-// QueryIsSudoAdminRequest defines the request structure for the
-// IsSudoAdmin gRPC query.
-type QueryIsSudoAdminRequest struct {
-	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty" yaml:"address"`
-}
-
-func (m *QueryIsSudoAdminRequest) Reset()         { *m = QueryIsSudoAdminRequest{} }
-func (m *QueryIsSudoAdminRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryIsSudoAdminRequest) ProtoMessage()    {}
-func (*QueryIsSudoAdminRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6f22013ad0f72e3f, []int{8}
-}
-func (m *QueryIsSudoAdminRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryIsSudoAdminRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryIsSudoAdminRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryIsSudoAdminRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryIsSudoAdminRequest.Merge(m, src)
-}
-func (m *QueryIsSudoAdminRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryIsSudoAdminRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryIsSudoAdminRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryIsSudoAdminRequest proto.InternalMessageInfo
-
-func (m *QueryIsSudoAdminRequest) GetAddress() string {
-	if m != nil {
-		return m.Address
-	}
-	return ""
-}
-
-// QueryIsSudoAdminResponse defines the response structure for the
-// IsSudoAdmin gRPC query.
-type QueryIsSudoAdminResponse struct {
-	IsSudoAdmin bool `protobuf:"varint,1,opt,name=is_sudo_admin,json=isSudoAdmin,proto3" json:"is_sudo_admin,omitempty" yaml:"is_sudo_admin"`
-}
-
-func (m *QueryIsSudoAdminResponse) Reset()         { *m = QueryIsSudoAdminResponse{} }
-func (m *QueryIsSudoAdminResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryIsSudoAdminResponse) ProtoMessage()    {}
-func (*QueryIsSudoAdminResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6f22013ad0f72e3f, []int{9}
-}
-func (m *QueryIsSudoAdminResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryIsSudoAdminResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryIsSudoAdminResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryIsSudoAdminResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryIsSudoAdminResponse.Merge(m, src)
-}
-func (m *QueryIsSudoAdminResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryIsSudoAdminResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryIsSudoAdminResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryIsSudoAdminResponse proto.InternalMessageInfo
-
-func (m *QueryIsSudoAdminResponse) GetIsSudoAdmin() bool {
-	if m != nil {
-		return m.IsSudoAdmin
-	}
-	return false
-}
-
-// QuerySudoAdminsRequest defines the request structure for the
-// SudoAdmins gRPC query.
-type QuerySudoAdminsRequest struct {
-}
-
-func (m *QuerySudoAdminsRequest) Reset()         { *m = QuerySudoAdminsRequest{} }
-func (m *QuerySudoAdminsRequest) String() string { return proto.CompactTextString(m) }
-func (*QuerySudoAdminsRequest) ProtoMessage()    {}
-func (*QuerySudoAdminsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6f22013ad0f72e3f, []int{10}
-}
-func (m *QuerySudoAdminsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QuerySudoAdminsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QuerySudoAdminsRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QuerySudoAdminsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QuerySudoAdminsRequest.Merge(m, src)
-}
-func (m *QuerySudoAdminsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QuerySudoAdminsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QuerySudoAdminsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QuerySudoAdminsRequest proto.InternalMessageInfo
-
-// QuerySudoAdminsResponse defines the response structure for the
-// SudoAdmins gRPC query.
-type QuerySudoAdminsResponse struct {
-	SudoAdmins []string `protobuf:"bytes,1,rep,name=sudo_admins,json=sudoAdmins,proto3" json:"sudo_admins,omitempty" yaml:"sudo_admins"`
-}
-
-func (m *QuerySudoAdminsResponse) Reset()         { *m = QuerySudoAdminsResponse{} }
-func (m *QuerySudoAdminsResponse) String() string { return proto.CompactTextString(m) }
-func (*QuerySudoAdminsResponse) ProtoMessage()    {}
-func (*QuerySudoAdminsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6f22013ad0f72e3f, []int{11}
-}
-func (m *QuerySudoAdminsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QuerySudoAdminsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QuerySudoAdminsResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QuerySudoAdminsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QuerySudoAdminsResponse.Merge(m, src)
-}
-func (m *QuerySudoAdminsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QuerySudoAdminsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QuerySudoAdminsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QuerySudoAdminsResponse proto.InternalMessageInfo
-
-func (m *QuerySudoAdminsResponse) GetSudoAdmins() []string {
-	if m != nil {
-		return m.SudoAdmins
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "osmosis.tokenfactory.v1beta1.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "osmosis.tokenfactory.v1beta1.QueryParamsResponse")
@@ -573,10 +397,6 @@ func init() {
 	proto.RegisterType((*QueryDenomsFromCreatorResponse)(nil), "osmosis.tokenfactory.v1beta1.QueryDenomsFromCreatorResponse")
 	proto.RegisterType((*QueryDenomsFromAdminRequest)(nil), "osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminRequest")
 	proto.RegisterType((*QueryDenomsFromAdminResponse)(nil), "osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminResponse")
-	proto.RegisterType((*QueryIsSudoAdminRequest)(nil), "osmosis.tokenfactory.v1beta1.QueryIsSudoAdminRequest")
-	proto.RegisterType((*QueryIsSudoAdminResponse)(nil), "osmosis.tokenfactory.v1beta1.QueryIsSudoAdminResponse")
-	proto.RegisterType((*QuerySudoAdminsRequest)(nil), "osmosis.tokenfactory.v1beta1.QuerySudoAdminsRequest")
-	proto.RegisterType((*QuerySudoAdminsResponse)(nil), "osmosis.tokenfactory.v1beta1.QuerySudoAdminsResponse")
 }
 
 func init() {
@@ -584,57 +404,47 @@ func init() {
 }
 
 var fileDescriptor_6f22013ad0f72e3f = []byte{
-	// 797 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xcd, 0x4e, 0x1b, 0x49,
-	0x10, 0xf6, 0xec, 0x2e, 0x66, 0x29, 0x2f, 0xbb, 0x4b, 0x2f, 0x62, 0xbd, 0xb3, 0xac, 0xbd, 0xe9,
-	0x20, 0x04, 0x0a, 0xf1, 0xc4, 0x04, 0x82, 0xf8, 0x13, 0xb1, 0x49, 0x82, 0x50, 0x82, 0x94, 0x4c,
-	0x2e, 0xf9, 0x39, 0x58, 0x0d, 0x6e, 0xcc, 0x28, 0xcc, 0xb4, 0x99, 0x6e, 0xa3, 0x58, 0xc8, 0x97,
-	0x1c, 0x72, 0x8e, 0x94, 0x63, 0x94, 0x37, 0x88, 0xf2, 0x02, 0x79, 0x01, 0x72, 0x43, 0xe2, 0x92,
-	0x93, 0x15, 0x41, 0x94, 0x07, 0xf0, 0x13, 0x44, 0xee, 0x69, 0xdb, 0x63, 0x8f, 0x33, 0xb2, 0xc9,
-	0xc9, 0x33, 0x55, 0xf5, 0x7d, 0xf5, 0x7d, 0xdd, 0x53, 0x25, 0xc3, 0x14, 0xe3, 0x36, 0xe3, 0x16,
-	0x37, 0x04, 0x7b, 0x46, 0x9d, 0x5d, 0xb2, 0x23, 0x98, 0x5b, 0x36, 0x0e, 0xd3, 0xdb, 0x54, 0x90,
-	0xb4, 0x71, 0x50, 0xa2, 0x6e, 0x39, 0x55, 0x74, 0x99, 0x60, 0x68, 0x5c, 0x55, 0xa6, 0xfc, 0x95,
-	0x29, 0x55, 0xa9, 0x8f, 0x16, 0x58, 0x81, 0xc9, 0x42, 0xa3, 0xfe, 0xe4, 0x61, 0xf4, 0xf1, 0x02,
-	0x63, 0x85, 0x7d, 0x6a, 0x90, 0xa2, 0x65, 0x10, 0xc7, 0x61, 0x82, 0x08, 0x8b, 0x39, 0x5c, 0x65,
-	0xe7, 0x42, 0x7b, 0x93, 0x92, 0xd8, 0x63, 0xae, 0x25, 0xca, 0x5b, 0x54, 0x90, 0x3c, 0x11, 0x44,
-	0xa1, 0xa6, 0x43, 0x51, 0x45, 0xe2, 0x12, 0x5b, 0x35, 0xc0, 0xa3, 0x80, 0x1e, 0xd4, 0x1d, 0xdc,
-	0x97, 0x41, 0x93, 0x1e, 0x94, 0x28, 0x17, 0xf8, 0x31, 0xfc, 0xd5, 0x16, 0xe5, 0x45, 0xe6, 0x70,
-	0x8a, 0xb2, 0x10, 0xf5, 0xc0, 0x71, 0xed, 0x7f, 0x6d, 0x2a, 0x36, 0x3b, 0x91, 0x0a, 0x33, 0x9c,
-	0xf2, 0xd0, 0xd9, 0x5f, 0x8e, 0xab, 0xc9, 0x88, 0xa9, 0x90, 0xf8, 0x1e, 0x60, 0x49, 0x7d, 0x8b,
-	0x3a, 0xcc, 0xce, 0x74, 0x1a, 0x50, 0x02, 0xd0, 0x24, 0x0c, 0xe4, 0xeb, 0x05, 0xb2, 0xd1, 0x50,
-	0xf6, 0xcf, 0x5a, 0x35, 0xf9, 0x5b, 0x99, 0xd8, 0xfb, 0x4b, 0x58, 0x86, 0xb1, 0xe9, 0xa5, 0xf1,
-	0x7b, 0x0d, 0x2e, 0x87, 0xd2, 0x29, 0xe5, 0x2f, 0x35, 0x40, 0xcd, 0xd3, 0xca, 0xd9, 0x2a, 0xad,
-	0x6c, 0xcc, 0x85, 0xdb, 0xe8, 0x4e, 0x9d, 0xbd, 0x54, 0xb7, 0x55, 0xab, 0x26, 0xff, 0xf1, 0x74,
-	0x05, 0xd9, 0xb1, 0x39, 0x12, 0xb8, 0x20, 0xbc, 0x05, 0xff, 0xb5, 0xf4, 0xf2, 0x3b, 0x2e, 0xb3,
-	0xd7, 0x5d, 0x4a, 0x04, 0x73, 0x1b, 0xce, 0x67, 0x60, 0x70, 0xc7, 0x8b, 0x28, 0xef, 0xa8, 0x56,
-	0x4d, 0xfe, 0xee, 0xf5, 0x50, 0x09, 0x6c, 0x36, 0x4a, 0xf0, 0x5d, 0x48, 0x7c, 0x8f, 0x4e, 0x39,
-	0x9f, 0x86, 0xa8, 0x3c, 0xaa, 0xfa, 0x9d, 0xfd, 0x3c, 0x35, 0x94, 0x1d, 0xa9, 0x55, 0x93, 0xc3,
-	0xbe, 0xa3, 0xe4, 0xd8, 0x54, 0x05, 0xf8, 0x36, 0xfc, 0xdb, 0x41, 0x96, 0xc9, 0xdb, 0x96, 0xe3,
-	0xbb, 0x13, 0x52, 0x7f, 0x0f, 0xde, 0x89, 0x0c, 0x63, 0xd3, 0x4b, 0xe3, 0x4d, 0x18, 0xef, 0x4e,
-	0xd3, 0xbf, 0xa2, 0x0d, 0xf8, 0x5b, 0x52, 0x6d, 0xf2, 0x87, 0xa5, 0x3c, 0x6b, 0x53, 0x33, 0x03,
-	0x83, 0x24, 0x9f, 0x77, 0x29, 0xe7, 0xc1, 0x73, 0x52, 0x09, 0x6c, 0x36, 0x4a, 0xf0, 0x23, 0x88,
-	0x07, 0x89, 0x94, 0x9e, 0x15, 0x18, 0xb6, 0x78, 0x8e, 0x97, 0xf2, 0x2c, 0xd7, 0xf2, 0xf7, 0x6b,
-	0x36, 0x5e, 0xab, 0x26, 0x47, 0x3d, 0xbe, 0xb6, 0x34, 0x36, 0x63, 0x56, 0x8b, 0x05, 0xc7, 0x61,
-	0x4c, 0x32, 0x37, 0x23, 0xcd, 0x21, 0x32, 0x95, 0x78, 0x7f, 0x46, 0xb5, 0x5c, 0x80, 0x58, 0x8b,
-	0xb0, 0x71, 0x0e, 0x63, 0xb5, 0x6a, 0x12, 0x79, 0x0d, 0x7d, 0x49, 0x6c, 0x02, 0x6f, 0x12, 0xcc,
-	0xbe, 0x1d, 0x82, 0x01, 0x49, 0x8a, 0xde, 0x68, 0x10, 0xf5, 0x06, 0x0c, 0x5d, 0x0b, 0xff, 0x7e,
-	0x83, 0xf3, 0xad, 0xa7, 0xfb, 0x40, 0x78, 0x92, 0xf1, 0xcc, 0x8b, 0xd3, 0x2f, 0xaf, 0x7f, 0x9a,
-	0x44, 0x13, 0x46, 0x0f, 0xcb, 0x05, 0x7d, 0xd5, 0x60, 0xac, 0xfb, 0xdc, 0xa0, 0x9b, 0x3d, 0xf4,
-	0x0e, 0x5d, 0x0e, 0x7a, 0xe6, 0x07, 0x18, 0x94, 0x9b, 0x0d, 0xe9, 0x26, 0x83, 0xd6, 0xc2, 0xdd,
-	0x78, 0x9f, 0xa1, 0x71, 0x24, 0x7f, 0x2b, 0x46, 0x70, 0xc6, 0xd1, 0xa9, 0x06, 0x23, 0x81, 0xe1,
-	0x43, 0xcb, 0xbd, 0x2a, 0xec, 0xb2, 0x01, 0xf4, 0x95, 0x8b, 0x81, 0x95, 0xb3, 0x75, 0xe9, 0x6c,
-	0x15, 0x2d, 0xf7, 0xe2, 0x2c, 0xb7, 0xeb, 0x32, 0x3b, 0xa7, 0x96, 0x89, 0x71, 0xa4, 0x1e, 0x2a,
-	0xe8, 0xa3, 0x06, 0x7f, 0x74, 0x8c, 0x2f, 0x5a, 0xec, 0x4b, 0x96, 0x7f, 0x56, 0xf5, 0xa5, 0x8b,
-	0x40, 0x95, 0x9f, 0x35, 0xe9, 0x67, 0x11, 0x2d, 0xf4, 0xee, 0x47, 0x0e, 0x8e, 0x71, 0x24, 0x7f,
-	0x2a, 0xe8, 0x83, 0x06, 0x31, 0xdf, 0xd8, 0xa3, 0xf9, 0x1e, 0xc4, 0x04, 0xf7, 0x8d, 0x7e, 0xa3,
-	0x5f, 0x98, 0xd2, 0xbf, 0x2a, 0xf5, 0x2f, 0xa0, 0xf9, 0x70, 0xfd, 0x6d, 0x2b, 0xa6, 0xae, 0x5d,
-	0xee, 0xad, 0x0a, 0x7a, 0xa7, 0x01, 0xb4, 0x16, 0x08, 0x9a, 0xeb, 0x41, 0x45, 0x60, 0x13, 0xe9,
-	0xf3, 0x7d, 0xa2, 0x94, 0xf4, 0xb4, 0x94, 0x7e, 0x05, 0x4d, 0x87, 0x4b, 0xf7, 0x2d, 0xab, 0xec,
-	0xd3, 0xe3, 0xb3, 0x84, 0x76, 0x72, 0x96, 0xd0, 0x3e, 0x9f, 0x25, 0xb4, 0x57, 0xe7, 0x89, 0xc8,
-	0xc9, 0x79, 0x22, 0xf2, 0xe9, 0x3c, 0x11, 0x79, 0x92, 0x29, 0x58, 0x62, 0xaf, 0xb4, 0x9d, 0xda,
-	0x61, 0xb6, 0xc1, 0x85, 0x4b, 0x9c, 0x02, 0xdd, 0x67, 0x87, 0xf4, 0xea, 0x21, 0x75, 0x44, 0xc9,
-	0xa5, 0x1d, 0xdc, 0xcf, 0xdb, 0x5f, 0x45, 0xb9, 0x48, 0xf9, 0x76, 0x54, 0xfe, 0x65, 0xb9, 0xfe,
-	0x2d, 0x00, 0x00, 0xff, 0xff, 0x87, 0x54, 0x03, 0x9b, 0x91, 0x09, 0x00, 0x00,
+	// 629 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0xcf, 0x6e, 0xd3, 0x4e,
+	0x10, 0xc7, 0xe3, 0xdf, 0x8f, 0x06, 0x75, 0xf9, 0x9b, 0xa5, 0x42, 0x60, 0x82, 0x03, 0x4b, 0x55,
+	0xa5, 0x52, 0xf1, 0x92, 0x52, 0x09, 0xb5, 0x05, 0x95, 0xb8, 0xfc, 0x11, 0x82, 0x4a, 0xe0, 0x1b,
+	0x70, 0x88, 0x36, 0xc9, 0xd6, 0xb5, 0x88, 0xbd, 0xa9, 0xbd, 0x89, 0x88, 0xa2, 0x5c, 0x38, 0x70,
+	0x46, 0xe2, 0xc8, 0x3b, 0x20, 0x1e, 0xa3, 0xdc, 0x2a, 0xf5, 0xc2, 0x29, 0x42, 0x09, 0xe2, 0x01,
+	0xf2, 0x04, 0xc8, 0xbb, 0x5b, 0x48, 0xe3, 0x60, 0x25, 0xe5, 0x64, 0x7b, 0x67, 0xe6, 0x3b, 0xf3,
+	0xd9, 0x99, 0x91, 0x41, 0x9e, 0x85, 0x1e, 0x0b, 0xdd, 0x10, 0x73, 0xf6, 0x86, 0xfa, 0xdb, 0xa4,
+	0xc2, 0x59, 0xd0, 0xc2, 0xcd, 0x42, 0x99, 0x72, 0x52, 0xc0, 0xbb, 0x0d, 0x1a, 0xb4, 0xcc, 0x7a,
+	0xc0, 0x38, 0x83, 0x59, 0xe5, 0x69, 0x0e, 0x7b, 0x9a, 0xca, 0x53, 0x9f, 0x73, 0x98, 0xc3, 0x84,
+	0x23, 0x8e, 0xde, 0x64, 0x8c, 0x9e, 0x75, 0x18, 0x73, 0x6a, 0x14, 0x93, 0xba, 0x8b, 0x89, 0xef,
+	0x33, 0x4e, 0xb8, 0xcb, 0xfc, 0x50, 0x59, 0x57, 0x12, 0x73, 0x93, 0x06, 0xdf, 0x61, 0x81, 0xcb,
+	0x5b, 0x5b, 0x94, 0x93, 0x2a, 0xe1, 0x44, 0x45, 0x2d, 0x26, 0x46, 0xd5, 0x49, 0x40, 0x3c, 0x95,
+	0x00, 0xcd, 0x01, 0xf8, 0x22, 0x22, 0x78, 0x2e, 0x0e, 0x6d, 0xba, 0xdb, 0xa0, 0x21, 0x47, 0x2f,
+	0xc1, 0x85, 0x23, 0xa7, 0x61, 0x9d, 0xf9, 0x21, 0x85, 0x16, 0x48, 0xcb, 0xe0, 0x4b, 0xda, 0x35,
+	0x2d, 0x7f, 0x6a, 0x79, 0xde, 0x4c, 0x02, 0x36, 0x65, 0xb4, 0x75, 0x62, 0xaf, 0x9b, 0x4b, 0xd9,
+	0x2a, 0x12, 0x3d, 0x03, 0x48, 0x48, 0x3f, 0xa0, 0x3e, 0xf3, 0x8a, 0xa3, 0x00, 0xaa, 0x00, 0xb8,
+	0x00, 0x66, 0xaa, 0x91, 0x83, 0x48, 0x34, 0x6b, 0x9d, 0x1f, 0x74, 0x73, 0xa7, 0x5b, 0xc4, 0xab,
+	0xad, 0x21, 0x71, 0x8c, 0x6c, 0x69, 0x46, 0x9f, 0x35, 0x70, 0x23, 0x51, 0x4e, 0x55, 0xfe, 0x5e,
+	0x03, 0xf0, 0xf7, 0x6d, 0x95, 0x3c, 0x65, 0x56, 0x18, 0x2b, 0xc9, 0x18, 0xe3, 0xa5, 0xad, 0xeb,
+	0x11, 0xd6, 0xa0, 0x9b, 0xbb, 0x2c, 0xeb, 0x8a, 0xab, 0x23, 0x3b, 0x13, 0x6b, 0x10, 0xda, 0x02,
+	0x57, 0xff, 0xd4, 0x1b, 0x3e, 0x0a, 0x98, 0xb7, 0x19, 0x50, 0xc2, 0x59, 0x70, 0x48, 0xbe, 0x04,
+	0x4e, 0x56, 0xe4, 0x89, 0x62, 0x87, 0x83, 0x6e, 0xee, 0xac, 0xcc, 0xa1, 0x0c, 0xc8, 0x3e, 0x74,
+	0x41, 0x4f, 0x81, 0xf1, 0x37, 0x39, 0x45, 0xbe, 0x08, 0xd2, 0xe2, 0xaa, 0xa2, 0x9e, 0xfd, 0x9f,
+	0x9f, 0xb5, 0x32, 0x83, 0x6e, 0xee, 0xcc, 0xd0, 0x55, 0x86, 0xc8, 0x56, 0x0e, 0xe8, 0x21, 0xb8,
+	0x32, 0x22, 0x56, 0xac, 0x7a, 0xae, 0x3f, 0xd4, 0x13, 0x12, 0x7d, 0xc7, 0x7b, 0x22, 0x8e, 0x91,
+	0x2d, 0xcd, 0xe8, 0x09, 0xc8, 0x8e, 0x97, 0x99, 0xba, 0xa2, 0xe5, 0x2f, 0x69, 0x30, 0x23, 0xb4,
+	0xe0, 0x27, 0x0d, 0xa4, 0xe5, 0x3c, 0xc1, 0x5b, 0xc9, 0xed, 0x8a, 0x8f, 0xb3, 0x5e, 0x98, 0x22,
+	0x42, 0x16, 0x89, 0x96, 0xde, 0x1d, 0xfc, 0xf8, 0xf8, 0xdf, 0x02, 0x9c, 0xc7, 0x13, 0xec, 0x12,
+	0xfc, 0xa9, 0x81, 0x8b, 0xe3, 0xc7, 0x04, 0xde, 0x9f, 0x20, 0x77, 0xe2, 0x2e, 0xe8, 0xc5, 0x7f,
+	0x50, 0x50, 0x34, 0x8f, 0x05, 0x4d, 0x11, 0x6e, 0x24, 0xd3, 0xc8, 0x5b, 0xc7, 0x6d, 0xf1, 0xec,
+	0xe0, 0xf8, 0x48, 0xc3, 0x03, 0x0d, 0x64, 0x62, 0xb3, 0x06, 0xd7, 0x27, 0xad, 0x70, 0xcc, 0xc0,
+	0xeb, 0x77, 0x8f, 0x17, 0xac, 0xc8, 0x36, 0x05, 0xd9, 0x3d, 0xb8, 0x3e, 0x09, 0x59, 0x69, 0x3b,
+	0x60, 0x5e, 0x49, 0xed, 0x0e, 0x6e, 0xab, 0x97, 0x0e, 0xfc, 0xaa, 0x81, 0x73, 0x23, 0xd3, 0x0a,
+	0x57, 0xa7, 0x2a, 0x6b, 0x78, 0x51, 0xf4, 0xb5, 0xe3, 0x84, 0x2a, 0x9e, 0x0d, 0xc1, 0xb3, 0x0a,
+	0xef, 0x4c, 0xce, 0x23, 0xb6, 0x0e, 0xb7, 0xc5, 0xa3, 0x63, 0xbd, 0xde, 0xeb, 0x19, 0xda, 0x7e,
+	0xcf, 0xd0, 0xbe, 0xf7, 0x0c, 0xed, 0x43, 0xdf, 0x48, 0xed, 0xf7, 0x8d, 0xd4, 0xb7, 0xbe, 0x91,
+	0x7a, 0x55, 0x74, 0x5c, 0xbe, 0xd3, 0x28, 0x9b, 0x15, 0xe6, 0xe1, 0x90, 0x07, 0xc4, 0x77, 0x68,
+	0x8d, 0x35, 0xe9, 0xcd, 0x26, 0xf5, 0x79, 0x23, 0xa0, 0x23, 0x99, 0xde, 0x1e, 0xfd, 0xe4, 0xad,
+	0x3a, 0x0d, 0xcb, 0x69, 0xf1, 0xd3, 0xb8, 0xfd, 0x2b, 0x00, 0x00, 0xff, 0xff, 0xd3, 0xc2, 0x92,
+	0xa0, 0x13, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -661,12 +471,6 @@ type QueryClient interface {
 	// DenomsFromAdmin defines a gRPC query method for fetching all
 	// denominations owned by a specific admin.
 	DenomsFromAdmin(ctx context.Context, in *QueryDenomsFromAdminRequest, opts ...grpc.CallOption) (*QueryDenomsFromAdminResponse, error)
-	// IsSudoAdmin defines a gRPC query method for checking whether an address is
-	// a sudo admin.
-	IsSudoAdmin(ctx context.Context, in *QueryIsSudoAdminRequest, opts ...grpc.CallOption) (*QueryIsSudoAdminResponse, error)
-	// SudoAdmins defines a gRPC query method for fetching all sudo admin
-	// addresses.
-	SudoAdmins(ctx context.Context, in *QuerySudoAdminsRequest, opts ...grpc.CallOption) (*QuerySudoAdminsResponse, error)
 }
 
 type queryClient struct {
@@ -713,24 +517,6 @@ func (c *queryClient) DenomsFromAdmin(ctx context.Context, in *QueryDenomsFromAd
 	return out, nil
 }
 
-func (c *queryClient) IsSudoAdmin(ctx context.Context, in *QueryIsSudoAdminRequest, opts ...grpc.CallOption) (*QueryIsSudoAdminResponse, error) {
-	out := new(QueryIsSudoAdminResponse)
-	err := c.cc.Invoke(ctx, "/osmosis.tokenfactory.v1beta1.Query/IsSudoAdmin", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) SudoAdmins(ctx context.Context, in *QuerySudoAdminsRequest, opts ...grpc.CallOption) (*QuerySudoAdminsResponse, error) {
-	out := new(QuerySudoAdminsResponse)
-	err := c.cc.Invoke(ctx, "/osmosis.tokenfactory.v1beta1.Query/SudoAdmins", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Params defines a gRPC query method that returns the tokenfactory module's
@@ -745,12 +531,6 @@ type QueryServer interface {
 	// DenomsFromAdmin defines a gRPC query method for fetching all
 	// denominations owned by a specific admin.
 	DenomsFromAdmin(context.Context, *QueryDenomsFromAdminRequest) (*QueryDenomsFromAdminResponse, error)
-	// IsSudoAdmin defines a gRPC query method for checking whether an address is
-	// a sudo admin.
-	IsSudoAdmin(context.Context, *QueryIsSudoAdminRequest) (*QueryIsSudoAdminResponse, error)
-	// SudoAdmins defines a gRPC query method for fetching all sudo admin
-	// addresses.
-	SudoAdmins(context.Context, *QuerySudoAdminsRequest) (*QuerySudoAdminsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -768,12 +548,6 @@ func (*UnimplementedQueryServer) DenomsFromCreator(ctx context.Context, req *Que
 }
 func (*UnimplementedQueryServer) DenomsFromAdmin(ctx context.Context, req *QueryDenomsFromAdminRequest) (*QueryDenomsFromAdminResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DenomsFromAdmin not implemented")
-}
-func (*UnimplementedQueryServer) IsSudoAdmin(ctx context.Context, req *QueryIsSudoAdminRequest) (*QueryIsSudoAdminResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsSudoAdmin not implemented")
-}
-func (*UnimplementedQueryServer) SudoAdmins(ctx context.Context, req *QuerySudoAdminsRequest) (*QuerySudoAdminsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SudoAdmins not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -852,42 +626,6 @@ func _Query_DenomsFromAdmin_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_IsSudoAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryIsSudoAdminRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).IsSudoAdmin(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/osmosis.tokenfactory.v1beta1.Query/IsSudoAdmin",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).IsSudoAdmin(ctx, req.(*QueryIsSudoAdminRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_SudoAdmins_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QuerySudoAdminsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).SudoAdmins(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/osmosis.tokenfactory.v1beta1.Query/SudoAdmins",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).SudoAdmins(ctx, req.(*QuerySudoAdminsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "osmosis.tokenfactory.v1beta1.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -907,14 +645,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DenomsFromAdmin",
 			Handler:    _Query_DenomsFromAdmin_Handler,
-		},
-		{
-			MethodName: "IsSudoAdmin",
-			Handler:    _Query_IsSudoAdmin_Handler,
-		},
-		{
-			MethodName: "SudoAdmins",
-			Handler:    _Query_SudoAdmins_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1164,124 +894,6 @@ func (m *QueryDenomsFromAdminResponse) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryIsSudoAdminRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryIsSudoAdminRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryIsSudoAdminRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryIsSudoAdminResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryIsSudoAdminResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryIsSudoAdminResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.IsSudoAdmin {
-		i--
-		if m.IsSudoAdmin {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QuerySudoAdminsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QuerySudoAdminsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QuerySudoAdminsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *QuerySudoAdminsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QuerySudoAdminsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QuerySudoAdminsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.SudoAdmins) > 0 {
-		for iNdEx := len(m.SudoAdmins) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.SudoAdmins[iNdEx])
-			copy(dAtA[i:], m.SudoAdmins[iNdEx])
-			i = encodeVarintQuery(dAtA, i, uint64(len(m.SudoAdmins[iNdEx])))
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -1386,55 +998,6 @@ func (m *QueryDenomsFromAdminResponse) Size() (n int) {
 	_ = l
 	if len(m.Denoms) > 0 {
 		for _, s := range m.Denoms {
-			l = len(s)
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *QueryIsSudoAdminRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryIsSudoAdminResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.IsSudoAdmin {
-		n += 2
-	}
-	return n
-}
-
-func (m *QuerySudoAdminsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *QuerySudoAdminsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.SudoAdmins) > 0 {
-		for _, s := range m.SudoAdmins {
 			l = len(s)
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -2052,290 +1615,6 @@ func (m *QueryDenomsFromAdminResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Denoms = append(m.Denoms, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryIsSudoAdminRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryIsSudoAdminRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryIsSudoAdminRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryIsSudoAdminResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryIsSudoAdminResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryIsSudoAdminResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IsSudoAdmin", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.IsSudoAdmin = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QuerySudoAdminsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QuerySudoAdminsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QuerySudoAdminsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QuerySudoAdminsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QuerySudoAdminsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QuerySudoAdminsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SudoAdmins", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SudoAdmins = append(m.SudoAdmins, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

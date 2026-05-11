@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,6 +10,18 @@ import (
 func (suite *KeeperTestSuite) TestGenesis() {
 	genesisState := types.GenesisState{
 		FactoryDenoms: []types.GenesisDenom{
+			{
+				Denom: "super_cheese",
+				AuthorityMetadata: types.DenomAuthorityMetadata{
+					Admin: "cosmos1uvye96zkp86egcwrnsff22ama3c0m8h2wyjlj6",
+				},
+			},
+			{
+				Denom: "unbound",
+				AuthorityMetadata: types.DenomAuthorityMetadata{
+					Admin: "cosmos15czt5nhlnvayqq37xun9s9yus0d6y26dx74r5p",
+				},
+			},
 			{
 				Denom: "factory/cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8/bitcoin",
 				AuthorityMetadata: types.DenomAuthorityMetadata{
@@ -30,10 +41,6 @@ func (suite *KeeperTestSuite) TestGenesis() {
 				},
 			},
 		},
-		SudoAdmins: []string{
-			"cosmos1t7egva48prqmzl59x5ngv4zx0dtrwewcdqdjr8",
-			"cosmos15czt5nhlnvayqq37xun9s9yus0d6y26dx74r5p",
-		},
 	}
 
 	suite.SetupTestForInitGenesis()
@@ -42,7 +49,7 @@ func (suite *KeeperTestSuite) TestGenesis() {
 	// Test both with bank denom metadata set, and not set.
 	for i, denom := range genesisState.FactoryDenoms {
 		// hacky, sets bank metadata to exist if i != 0, to cover both cases.
-		if i != 0 {
+		if (i & 1) != 0 {
 			app.BankKeeper.SetDenomMetaData(suite.Ctx, banktypes.Metadata{Base: denom.GetDenom()})
 		}
 	}
@@ -55,19 +62,4 @@ func (suite *KeeperTestSuite) TestGenesis() {
 	exportedGenesis := app.TokenFactoryKeeper.ExportGenesis(suite.Ctx)
 	suite.Require().NotNil(exportedGenesis)
 	suite.Require().Equal(genesisState, *exportedGenesis)
-}
-
-func (suite *KeeperTestSuite) TestGenesisStoresSudoAdmins() {
-	genesisState := types.GenesisState{
-		SudoAdmins: []string{
-			suite.TestAccs[0].String(),
-			suite.TestAccs[1].String(),
-		},
-	}
-
-	sa := keeper.SudoAdmins{Keeper: suite.App.TokenFactoryKeeper}
-	suite.App.TokenFactoryKeeper.InitGenesis(suite.Ctx, genesisState)
-
-	suite.Require().True(sa.IsSudoAdmin(suite.Ctx, suite.TestAccs[0].String()))
-	suite.Require().True(sa.IsSudoAdmin(suite.Ctx, suite.TestAccs[1].String()))
 }
