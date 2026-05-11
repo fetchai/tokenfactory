@@ -1,18 +1,9 @@
 package keeper
 
 import (
-	"sync"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
-)
-
-var (
-	moduleAddress = sync.OnceValue(func() string {
-		return authtypes.NewModuleAddress(types.ModuleName).String()
-	})
 )
 
 // ConvertToBaseToken converts a fee amount in a whitelisted fee token to the base fee token amount
@@ -51,10 +42,7 @@ func (k Keeper) createDenomAfterValidation(ctx sdk.Context, adminAddr string, de
 
 		k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)
 	} else {
-		// TODO(pb): Alternative solution - the commented line should be deleted once the primary solution
-		//           is proven to work.
-		//addr := k.accountKeeper.GetModuleAccount(ctx, types.ModuleName).String()
-		creatorAddr = moduleAddress()
+		creatorAddr = types.ModuleAddress()
 	}
 
 	authorityMetadata := types.DenomAuthorityMetadata{
