@@ -26,9 +26,21 @@ func (k Keeper) mintTo(ctx sdk.Context, amount sdk.Coin, mintTo string) error {
 		return fmt.Errorf("failed to mint to blocked address: %s", addr)
 	}
 
-	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName,
+	if err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName,
 		addr,
-		sdk.NewCoins(amount))
+		sdk.NewCoins(amount)); err != nil {
+		return err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.TypeMsgMint,
+			sdk.NewAttribute(types.AttributeMintToAddress, mintTo),
+			sdk.NewAttribute(types.AttributeAmount, amount.String()),
+		),
+	})
+
+	return nil
 }
 
 func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string /*, isTokenOwner bool*/) error {
@@ -49,7 +61,19 @@ func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coin, burnFrom string /*, i
 		return err
 	}
 
-	return k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(amount))
+	if err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(amount)); err != nil {
+		return err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.TypeMsgBurn,
+			sdk.NewAttribute(types.AttributeBurnFromAddress, burnFrom),
+			sdk.NewAttribute(types.AttributeAmount, amount.String()),
+		),
+	})
+
+	return nil
 }
 
 func (k Keeper) forceTransfer(ctx sdk.Context, amount sdk.Coin, fromAddr string, toAddr string) error {
@@ -90,5 +114,18 @@ func (k Keeper) forceTransfer(ctx sdk.Context, amount sdk.Coin, fromAddr string,
 		return fmt.Errorf("failed to force transfer to blocked address: %s", toSdkAddr)
 	}
 
-	return k.bankKeeper.SendCoins(ctx, fromSdkAddr, toSdkAddr, sdk.NewCoins(amount))
+	if err = k.bankKeeper.SendCoins(ctx, fromSdkAddr, toSdkAddr, sdk.NewCoins(amount)); err != nil {
+		return err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.TypeMsgForceTransfer,
+			sdk.NewAttribute(types.AttributeTransferFromAddress, fromAddr),
+			sdk.NewAttribute(types.AttributeTransferToAddress, toAddr),
+			sdk.NewAttribute(types.AttributeAmount, amount.String()),
+		),
+	})
+
+	return nil
 }

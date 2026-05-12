@@ -16,6 +16,7 @@ const (
 	TypeMsgForceTransfer    = "force_transfer"
 	TypeMsgChangeAdmin      = "change_admin"
 	TypeMsgSetDenomMetadata = "set_denom_metadata"
+	SetAdminEvent           = "tf_set_admin"
 )
 
 var _ sdk.Msg = &MsgCreateDenom{}
