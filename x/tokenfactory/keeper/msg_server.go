@@ -35,14 +35,6 @@ func (server msgServer) CreateDenom(goCtx context.Context, msg *types.MsgCreateD
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.TypeMsgCreateDenom,
-			sdk.NewAttribute(types.AttributeCreator, msg.Sender),
-			sdk.NewAttribute(types.AttributeNewTokenDenom, denom),
-		),
-	})
-
 	return &types.MsgCreateDenomResponse{
 		NewTokenDenom: denom,
 	}, nil
@@ -83,14 +75,6 @@ func (server msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.
 	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.TypeMsgMint,
-			sdk.NewAttribute(types.AttributeMintToAddress, msg.MintToAddress),
-			sdk.NewAttribute(types.AttributeAmount, msg.Amount.String()),
-		),
-	})
 
 	return &types.MsgMintResponse{}, nil
 }
@@ -140,14 +124,6 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.TypeMsgBurn,
-			sdk.NewAttribute(types.AttributeBurnFromAddress, msg.BurnFromAddress),
-			sdk.NewAttribute(types.AttributeAmount, msg.Amount.String()),
-		),
-	})
-
 	return &types.MsgBurnResponse{}, nil
 }
 
@@ -171,15 +147,6 @@ func (server msgServer) ForceTransfer(goCtx context.Context, msg *types.MsgForce
 	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.TypeMsgForceTransfer,
-			sdk.NewAttribute(types.AttributeTransferFromAddress, msg.TransferFromAddress),
-			sdk.NewAttribute(types.AttributeTransferToAddress, msg.TransferToAddress),
-			sdk.NewAttribute(types.AttributeAmount, msg.Amount.String()),
-		),
-	})
 
 	return &types.MsgForceTransferResponse{}, nil
 }
@@ -205,6 +172,7 @@ func (server msgServer) ChangeAdmin(goCtx context.Context, msg *types.MsgChangeA
 	if err != nil {
 		return nil, err
 	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.TypeMsgChangeAdmin,

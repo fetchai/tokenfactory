@@ -55,6 +55,7 @@ func (k Keeper) createDenomAfterValidation(ctx sdk.Context, adminAddr string, de
 	}
 
 	k.addDenomFromCreator(ctx, creatorAddr, denom)
+
 	return nil
 }
 

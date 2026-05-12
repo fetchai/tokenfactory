@@ -202,6 +202,7 @@ func (suite *KeeperTestSuite) TestChangeAdminDenomMsg() {
 			// Create a denom and mint
 			res, err := suite.msgServer.CreateDenom(ctx, types.NewMsgCreateDenom(suite.TestAccs[0].String(), "bitcoin"))
 			suite.Require().NoError(err)
+			suite.AssertEventEmitted(ctx, types.SetAdminEvent, 1)
 			testDenom := res.GetNewTokenDenom()
 			suite.msgServer.Mint(ctx, types.NewMsgMint(suite.TestAccs[0].String(), sdk.NewInt64Coin(testDenom, 10))) //nolint:errcheck
 			// Test change admin message
