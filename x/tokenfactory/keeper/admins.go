@@ -14,6 +14,10 @@ import (
 func (k Keeper) GetAuthorityMetadata(ctx context.Context, denom string) (types.DenomAuthorityMetadata, error) {
 	bz := k.GetDenomPrefixStore(sdk.UnwrapSDKContext(ctx), denom).Get([]byte(types.DenomAuthorityMetadataKey))
 
+	if bz == nil {
+		return types.DenomAuthorityMetadata{}, types.ErrDenomIsNotRegistered.Wrapf("denom: \"%s\"", denom)
+	}
+
 	metadata := types.DenomAuthorityMetadata{}
 	err := proto.Unmarshal(bz, &metadata)
 	if err != nil {

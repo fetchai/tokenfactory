@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
+	"github.com/strangelove-ventures/tokenfactory/app"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 
@@ -84,36 +85,222 @@ func (suite *KeeperTestSuite) TestMintDenomMsg() {
 func (suite *KeeperTestSuite) TestBurnDenomMsg() {
 	// Create a denom.
 	suite.CreateDefaultDenom()
+	nonFactoryDenom := "unique"
+	unregisteredNonFactoryDenom := "unregistered"
+	amount := int64(10)
+
+	unboundCoins := sdk.NewCoins(sdk.NewInt64Coin(nonFactoryDenom, amount))
+	suite.Assert().NoError(suite.App.BankKeeper.MintCoins(suite.Ctx, types.ModuleName, unboundCoins))
+	suite.Assert().NoError(suite.App.BankKeeper.SendCoinsFromModuleToAccount(suite.Ctx, types.ModuleName, suite.TestAccs[0], unboundCoins))
+
+	unregisteredUnboundCoins := sdk.NewCoins(sdk.NewInt64Coin(unregisteredNonFactoryDenom, amount))
+	suite.Assert().NoError(suite.App.BankKeeper.MintCoins(suite.Ctx, types.ModuleName, unregisteredUnboundCoins))
+	suite.Assert().NoError(suite.App.BankKeeper.SendCoinsFromModuleToAccount(suite.Ctx, types.ModuleName, suite.TestAccs[0], unregisteredUnboundCoins))
+
+	ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
+
+	admin2 := suite.TestAccs[1].String()
+
+	udc := keeper.NewUnboundDenomCreator(suite.App.TokenFactoryKeeper)
+	suite.Assert().NoError(udc.CreateDenom(ctx, admin2, nonFactoryDenom))
+
+	//factoryDenom, err := suite.App.TokenFactoryKeeper.CreateDenom(ctx, admin2, nonFactoryDenom)
+	//suite.Assert().NoError(err)
+
+	////expectedFactoryDenom, err := types.GetTokenDenom(admin2, nonFactoryDenom)
+	////suite.Assert().NoError(err)
+	////suite.Assert().Equal(factoryDenom, expectedFactoryDenom)
+
+	// Proof, that both denoms have been correctly created and the `admin2` account is their admin:
+	res, _ := suite.App.TokenFactoryKeeper.DenomsFromAdmin(ctx, &types.QueryDenomsFromAdminRequest{Admin: admin2})
+	denoms := types.NewSet[string](res.GetDenoms()...)
+	suite.Assert().True(denoms.Contains(nonFactoryDenom))
+	//suite.Assert().True(denoms.Contains(factoryDenom))
+
 	// mint 10 default token for testAcc[0]
-	suite.msgServer.Mint(suite.Ctx, types.NewMsgMint(suite.TestAccs[0].String(), sdk.NewInt64Coin(suite.defaultDenom, 10))) //nolint:errcheck
+	suite.msgServer.Mint(suite.Ctx, types.NewMsgMintTo(suite.TestAccs[0].String(), sdk.NewInt64Coin(suite.defaultDenom, amount), suite.TestAccs[2].String())) //nolint:errcheck
+
+	capabilities_EnableBurnUnregistered_DISABLED := []string{
+		types.EnableBurnOwn,
+		//types.EnableBurnOwnUnregistered,
+		types.EnableBurnFrom,
+		types.EnableForceTransfer,
+		types.EnableSetMetadata,
+		types.EnableSudoMint,
+		types.EnableCommunityPoolFeeFunding,
+	}
+
+	capabilities_EnableBurnOwn_DISABLED := []string{
+		//types.EnableBurnOwn,
+		types.EnableBurnOwnUnregistered,
+		types.EnableBurnFrom,
+		types.EnableForceTransfer,
+		types.EnableSetMetadata,
+		types.EnableSudoMint,
+		types.EnableCommunityPoolFeeFunding,
+	}
+
+	capabilities_EnableBurnFrom_DISABLED := []string{
+		types.EnableBurnOwn,
+		types.EnableBurnOwnUnregistered,
+		//types.EnableBurnFrom,
+		types.EnableForceTransfer,
+		types.EnableSetMetadata,
+		types.EnableSudoMint,
+		types.EnableCommunityPoolFeeFunding,
+	}
+
+	//capabilities_ALLBurnOwn_DISABLED := []string{
+	//	//types.EnableBurnOwn,
+	//	//types.EnableBurnOwnUnregistered,
+	//	types.EnableBurnFrom,
+	//	types.EnableForceTransfer,
+	//	types.EnableSetMetadata,
+	//	types.EnableSudoMint,
+	//	types.EnableCommunityPoolFeeFunding,
+	//}
+
+	//capabilities_Burn_DISABLED := []string{
+	//	//types.EnableBurnOwn,
+	//	//types.EnableBurnOwnUnregistered,
+	//	//types.EnableBurnFrom,
+	//	types.EnableForceTransfer,
+	//	types.EnableSetMetadata,
+	//	types.EnableSudoMint,
+	//	types.EnableCommunityPoolFeeFunding,
+	//}
 
 	for _, tc := range []struct {
 		desc                  string
 		amount                int64
 		burnDenom             string
 		admin                 string
+		burnFrom              string
 		valid                 bool
 		expectedMessageEvents int
+		capabilities          []string
 	}{
 		{
-			desc:      "denom does not exist",
-			burnDenom: "factory/osmo1t7egva48prqmzl59x5ngv4zx0dtrwewc9m7z44/evmos",
-			admin:     suite.TestAccs[0].String(),
-			valid:     false,
+			desc:                  "denom does not exist",
+			burnDenom:             "factory/osmo1t7egva48prqmzl59x5ngv4zx0dtrwewc9m7z44/evmos",
+			admin:                 suite.TestAccs[0].String(),
+			burnFrom:              suite.TestAccs[2].String(),
+			valid:                 false,
+			amount:                1,
+			expectedMessageEvents: 0,
 		},
 		{
 			desc:                  "success case",
 			burnDenom:             suite.defaultDenom,
 			admin:                 suite.TestAccs[0].String(),
+			burnFrom:              suite.TestAccs[2].String(),
 			valid:                 true,
+			amount:                1,
 			expectedMessageEvents: 1,
+		},
+		{
+			desc:                  "EnableBurnOwnUnregistered ENABLED: successful burn of OWN Registerd non-factory denom coins",
+			burnDenom:             nonFactoryDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 true,
+			amount:                1,
+			expectedMessageEvents: 1,
+		},
+		{
+			desc:                  "EnableBurnOwnUnregistered DISABLED: successful burn of OWN Registerd non-factory denom coins",
+			burnDenom:             nonFactoryDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 true,
+			amount:                1,
+			expectedMessageEvents: 1,
+			capabilities:          capabilities_EnableBurnUnregistered_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnOwnUnregistered ENABLED: successful burn of OWN UNregisterd non-factory denom coins",
+			burnDenom:             unregisteredNonFactoryDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 true,
+			amount:                1,
+			expectedMessageEvents: 1,
+		},
+		{
+			desc:                  "EnableBurnOwnUnregistered DISABLED: failed burn of OWN UNregisterd non-factory denom coins",
+			burnDenom:             unregisteredNonFactoryDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 false,
+			amount:                1,
+			expectedMessageEvents: 0,
+			capabilities:          capabilities_EnableBurnUnregistered_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnOwn DISABLED: failed burn of OWN non-factory denom coins",
+			burnDenom:             nonFactoryDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 false,
+			amount:                1,
+			expectedMessageEvents: 0,
+			capabilities:          capabilities_EnableBurnOwn_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnOwn DISABLED: successful burn of non-factory denom coins as admin",
+			burnDenom:             nonFactoryDenom,
+			admin:                 admin2,
+			burnFrom:              suite.TestAccs[0].String(),
+			valid:                 true,
+			amount:                1,
+			expectedMessageEvents: 1,
+			capabilities:          capabilities_EnableBurnOwn_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnFrom DISABLED: successful burn of OWN non-factory denom coins",
+			burnDenom:             nonFactoryDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 true,
+			amount:                1,
+			expectedMessageEvents: 1,
+			capabilities:          capabilities_EnableBurnFrom_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnFrom DISABLED: failed burn of non-factory denom coins as admin",
+			burnDenom:             nonFactoryDenom,
+			admin:                 admin2,
+			burnFrom:              suite.TestAccs[0].String(),
+			valid:                 false,
+			amount:                1,
+			expectedMessageEvents: 0,
+			capabilities:          capabilities_EnableBurnFrom_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnFrom DISABLED: failed burn of factory denom coins as admin",
+			burnDenom:             suite.defaultDenom,
+			admin:                 suite.TestAccs[0].String(),
+			burnFrom:              suite.TestAccs[2].String(),
+			valid:                 false,
+			amount:                1,
+			expectedMessageEvents: 0,
+			capabilities:          capabilities_EnableBurnFrom_DISABLED,
 		},
 	} {
 		suite.Run(fmt.Sprintf("Case %s", tc.desc), func() {
+			if tc.capabilities == nil {
+				tc.capabilities = app.TokenFactoryAllCapabilities
+			}
+
+			suite.App.TokenFactoryKeeper.SetEnabledCapabilities(suite.Ctx, tc.capabilities)
+			suite.msgServer = keeper.NewMsgServerImpl(suite.App.TokenFactoryKeeper)
+
 			ctx := suite.Ctx.WithEventManager(sdk.NewEventManager())
 			suite.Require().Equal(0, len(ctx.EventManager().Events()))
+
 			// Test burn message
-			suite.msgServer.Burn(ctx, types.NewMsgBurn(tc.admin, sdk.NewInt64Coin(tc.burnDenom, 10))) //nolint:errcheck
+			var msgBurn *types.MsgBurn
+			if tc.burnFrom == "" {
+				msgBurn = types.NewMsgBurn(tc.admin, sdk.NewInt64Coin(tc.burnDenom, tc.amount))
+			} else {
+				msgBurn = types.NewMsgBurnFrom(tc.admin, sdk.NewInt64Coin(tc.burnDenom, tc.amount), tc.burnFrom)
+			}
+			suite.msgServer.Burn(ctx, msgBurn) //nolint:errcheck
+
 			// Ensure current number and type of event is emitted
 			suite.AssertEventEmitted(ctx, types.TypeMsgBurn, tc.expectedMessageEvents)
 		})
