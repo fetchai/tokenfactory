@@ -90,8 +90,19 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		isBurningOwn = true
 	}
 
+	authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
+	isRegistered := err == nil
+	if !isRegistered && !server.IsCapabilityEnabled(types.EnableBurnOwnUnregistered) {
+		return nil, err
+	}
+
+	// The following code section is exclusively for case when:
+	//  * either burning someone's else's tokens
+	//  * or burning own tokens, but EnableBurnOwn is disabled
 	if !(isBurningOwn && server.IsCapabilityEnabled(types.EnableBurnOwn)) {
-		if !server.IsCapabilityEnabled(types.EnableBurnFrom) {
+		// Denom admin *can* burn its own tokens even if the EnableBurnFrom is *disabled*.
+		// This is sensical, as the admin burns it sown tokens and *not* tokens from another account.
+		if !isBurningOwn && !server.IsCapabilityEnabled(types.EnableBurnFrom) {
 			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableBurnFrom)
 		}
 
@@ -109,17 +120,12 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 			}
 		}
 
-		authorityMetadata, err := server.Keeper.GetAuthorityMetadata(ctx, msg.Amount.GetDenom())
-		if err != nil {
-			return nil, err
-		}
-
-		if msg.Sender != authorityMetadata.GetAdmin() {
+		if !isRegistered || msg.Sender != authorityMetadata.GetAdmin() {
 			return nil, types.ErrUnauthorized.Wrapf("the '%s' sender is NOT '%s' admin of the '%s' denomination", msg.Sender, authorityMetadata.GetAdmin(), msg.Amount.GetDenom())
 		}
 	}
 
-	err := server.Keeper.burnFrom(ctx, msg.Amount, msg.BurnFromAddress)
+	err = server.Keeper.burnFrom(ctx, msg.Amount, msg.BurnFromAddress)
 	if err != nil {
 		return nil, err
 	}

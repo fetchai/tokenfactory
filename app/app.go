@@ -147,8 +147,9 @@ var (
 	DefaultNodeHome = ".tokend"
 	BinaryName      = "tokend"
 
-	tokenFactoryCapabilities = []string{
+	TokenFactoryAllCapabilities = []string{
 		tokenfactorytypes.EnableBurnOwn,
+		tokenfactorytypes.EnableBurnOwnUnregistered,
 		tokenfactorytypes.EnableBurnFrom,
 		tokenfactorytypes.EnableForceTransfer,
 		tokenfactorytypes.EnableSetMetadata,
@@ -551,7 +552,7 @@ func NewApp(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.DistrKeeper,
-		tokenFactoryCapabilities,
+		TokenFactoryAllCapabilities,
 		govModAddress,
 	)
 	wasmOpts = append(wasmOpts, bindings.RegisterCustomPlugins(app.BankKeeper, &app.TokenFactoryKeeper)...)

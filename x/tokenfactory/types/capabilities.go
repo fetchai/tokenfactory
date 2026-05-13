@@ -4,9 +4,12 @@ const (
 	EnableSetMetadata   = "enable_metadata"
 	EnableForceTransfer = "enable_force_transfer"
 	// Allows to *ANY* owner of tokens (with *ANY* denomination) to burn these self-owned tokens.
-	// If disabled (not present), only admin of a denom or sudoer can execute the burn.
-	EnableBurnOwn  = "enable_burn_own"
-	EnableBurnFrom = "enable_burn_from"
+	// If disabled (not present), only admin of a denom or sudoer can execute the burn *IF* EnableBurnFrom is enabled.
+	EnableBurnOwn = "enable_burn_own"
+	// If enabled, token owner can burn its own tokens of any denomination which is *NOT* registred in tokenfactory.
+	// This capability depends on EnableBurnOwn = so, if enabled, it has *no* effect if the EnableBurnOwn is not enabled.
+	EnableBurnOwnUnregistered = "enable_burn_unregistered"
+	EnableBurnFrom            = "enable_burn_from"
 	// Allows addresses registered as sudo admins imn genesis store to mint tokens of *ANY* denominations.
 	// NOTE: with SudoMint enabled, the sudo admin can mint `any` token, not just tokenfactory tokens.
 	// This is intended behavior as requested by other teams, rather than having its own module with very minor logic.

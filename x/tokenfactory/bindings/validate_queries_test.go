@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	wasmbinding "github.com/strangelove-ventures/tokenfactory/x/tokenfactory/bindings"
+	"github.com/strangelove-ventures/tokenfactory/x/tokenfactory/keeper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -74,9 +75,14 @@ func TestDenomAdmin(t *testing.T) {
 
 	// create a subdenom via the token factory
 	admin := sdk.AccAddress([]byte("addr1_______________"))
-	tfDenom, err := app.TokenFactoryKeeper.CreateDenom(ctx, admin.String(), "subdenom")
+	validSubDenom := "validdenom"
+	tfDenom, err := app.TokenFactoryKeeper.CreateDenom(ctx, admin.String(), validSubDenom)
 	require.NoError(t, err)
 	require.NotEmpty(t, tfDenom)
+
+	registeredUnboundDenom := "registered"
+	udc := keeper.NewUnboundDenomCreator(app.TokenFactoryKeeper)
+	assert.NoError(t, udc.CreateDenom(ctx, admin.String(), registeredUnboundDenom))
 
 	queryPlugin := wasmbinding.NewQueryPlugin(app.BankKeeper, &app.TokenFactoryKeeper)
 
@@ -92,10 +98,22 @@ func TestDenomAdmin(t *testing.T) {
 			expectAdmin: admin.String(),
 		},
 		{
-			name:        "invalid token factory denom",
-			denom:       "uosmo",
-			expectErr:   false,
+			name:        "unregistered valid token factory denom",
+			denom:       fmt.Sprintf("factory/%s/%s", RandomBech32AccountAddress(), validSubDenom),
+			expectErr:   true,
 			expectAdmin: "",
+		},
+		{
+			name:        "unregistered unbound denom",
+			denom:       "uosmo",
+			expectErr:   true,
+			expectAdmin: "",
+		},
+		{
+			name:        "registered unbound denom",
+			denom:       registeredUnboundDenom,
+			expectErr:   false,
+			expectAdmin: admin.String(),
 		},
 	}
 
