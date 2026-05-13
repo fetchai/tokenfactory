@@ -97,7 +97,7 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 	}
 
 	if !(isBurningOwn && server.IsCapabilityEnabled(types.EnableBurnOwn)) {
-		if !server.IsCapabilityEnabled(types.EnableBurnFrom) {
+		if !isBurningOwn && !server.IsCapabilityEnabled(types.EnableBurnFrom) {
 			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableBurnFrom)
 		}
 

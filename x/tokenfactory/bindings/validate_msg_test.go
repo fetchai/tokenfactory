@@ -68,12 +68,13 @@ func TestChangeAdmin(t *testing.T) {
 
 	tokenCreator := RandomAccountAddress()
 
-	specs := map[string]struct {
+	type Spec struct {
 		actor       sdk.AccAddress
 		changeAdmin *bindings.ChangeAdmin
+		expErrMsg   func(Spec) string
+	}
 
-		expErrMsg string
-	}{
+	specs := map[string]Spec{
 		"valid": {
 			changeAdmin: &bindings.ChangeAdmin{
 				Denom:           fmt.Sprintf("factory/%s/%s", tokenCreator.String(), validDenom),
@@ -87,7 +88,7 @@ func TestChangeAdmin(t *testing.T) {
 				NewAdminAddress: RandomBech32AccountAddress(),
 			},
 			actor:     tokenCreator,
-			expErrMsg: "denom prefix is incorrect. Is: facory.  Should be: factory: invalid denom",
+			expErrMsg: func(_ Spec) string { return "denom prefix is incorrect. Is: facory.  Should be: factory: invalid denom" },
 		},
 		"invalid address in denom": {
 			changeAdmin: &bindings.ChangeAdmin{
@@ -95,7 +96,7 @@ func TestChangeAdmin(t *testing.T) {
 				NewAdminAddress: RandomBech32AccountAddress(),
 			},
 			actor:     tokenCreator,
-			expErrMsg: "failed changing admin from message: unauthorized account",
+			expErrMsg: func(s Spec) string { return fmt.Sprintf("failed changing admin from message: denom \"%s\": denom is not registered with tokenfactory", s.changeAdmin.Denom) },
 		},
 		"other denom name in 3 part name": {
 			changeAdmin: &bindings.ChangeAdmin{
@@ -103,7 +104,7 @@ func TestChangeAdmin(t *testing.T) {
 				NewAdminAddress: RandomBech32AccountAddress(),
 			},
 			actor:     tokenCreator,
-			expErrMsg: fmt.Sprintf("invalid denom: factory/%s/invalid denom", tokenCreator.String()),
+			expErrMsg: func(s Spec) string { return fmt.Sprintf("invalid denom: %s", s.changeAdmin.Denom) },
 		},
 		"empty denom": {
 			changeAdmin: &bindings.ChangeAdmin{
@@ -111,7 +112,7 @@ func TestChangeAdmin(t *testing.T) {
 				NewAdminAddress: RandomBech32AccountAddress(),
 			},
 			actor:     tokenCreator,
-			expErrMsg: "invalid denom: ",
+			expErrMsg: func(_ Spec) string { return "invalid denom: " },
 		},
 		"empty address": {
 			changeAdmin: &bindings.ChangeAdmin{
@@ -119,7 +120,7 @@ func TestChangeAdmin(t *testing.T) {
 				NewAdminAddress: "",
 			},
 			actor:     tokenCreator,
-			expErrMsg: "address from bech32: empty address string is not allowed",
+			expErrMsg: func(_ Spec) string { return "address from bech32: empty address string is not allowed" },
 		},
 		"creator is a different address": {
 			changeAdmin: &bindings.ChangeAdmin{
@@ -127,7 +128,7 @@ func TestChangeAdmin(t *testing.T) {
 				NewAdminAddress: RandomBech32AccountAddress(),
 			},
 			actor:     RandomAccountAddress(),
-			expErrMsg: "failed changing admin from message: unauthorized account",
+			expErrMsg: func(_ Spec) string { return "failed changing admin from message: unauthorized account" },
 		},
 		"change to the same address": {
 			changeAdmin: &bindings.ChangeAdmin{
@@ -138,7 +139,7 @@ func TestChangeAdmin(t *testing.T) {
 		},
 		"nil binding": {
 			actor:     tokenCreator,
-			expErrMsg: "invalid request: changeAdmin is nil - original request: ",
+			expErrMsg: func(_ Spec) string { return "invalid request: changeAdmin is nil - original request: " },
 		},
 	}
 	for name, spec := range specs {
@@ -156,10 +157,11 @@ func TestChangeAdmin(t *testing.T) {
 			require.NoError(t, err)
 
 			err = wasmbinding.ChangeAdmin(&app.TokenFactoryKeeper, ctx, spec.actor, spec.changeAdmin)
-			if len(spec.expErrMsg) > 0 {
+			if spec.expErrMsg != nil {
 				require.Error(t, err)
 				actualErrMsg := err.Error()
-				require.Equal(t, spec.expErrMsg, actualErrMsg)
+				expectedMsg := spec.expErrMsg(spec)
+				require.Equal(t, expectedMsg, actualErrMsg)
 				return
 			}
 			require.NoError(t, err)
