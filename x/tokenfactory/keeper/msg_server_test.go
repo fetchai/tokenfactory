@@ -117,8 +117,10 @@ func (suite *KeeperTestSuite) TestBurnDenomMsg() {
 	suite.Assert().True(denoms.Contains(nonFactoryDenom))
 	//suite.Assert().True(denoms.Contains(factoryDenom))
 
-	// mint 10 default token for testAcc[0]
+	// mint 10 default token for testAcc[2]
 	suite.msgServer.Mint(suite.Ctx, types.NewMsgMintTo(suite.TestAccs[0].String(), sdk.NewInt64Coin(suite.defaultDenom, amount), suite.TestAccs[2].String())) //nolint:errcheck
+	// mint 10 default token for admin testAcc[0]
+	suite.msgServer.Mint(suite.Ctx, types.NewMsgMintTo(suite.TestAccs[0].String(), sdk.NewInt64Coin(suite.defaultDenom, amount), suite.TestAccs[0].String())) //nolint:errcheck
 
 	capabilities_EnableBurnUnregistered_DISABLED := []string{
 		types.EnableBurnOwn,
@@ -149,26 +151,6 @@ func (suite *KeeperTestSuite) TestBurnDenomMsg() {
 		types.EnableSudoMint,
 		types.EnableCommunityPoolFeeFunding,
 	}
-
-	//capabilities_ALLBurnOwn_DISABLED := []string{
-	//	//types.EnableBurnOwn,
-	//	//types.EnableBurnOwnUnregistered,
-	//	types.EnableBurnFrom,
-	//	types.EnableForceTransfer,
-	//	types.EnableSetMetadata,
-	//	types.EnableSudoMint,
-	//	types.EnableCommunityPoolFeeFunding,
-	//}
-
-	//capabilities_Burn_DISABLED := []string{
-	//	//types.EnableBurnOwn,
-	//	//types.EnableBurnOwnUnregistered,
-	//	//types.EnableBurnFrom,
-	//	types.EnableForceTransfer,
-	//	types.EnableSetMetadata,
-	//	types.EnableSudoMint,
-	//	types.EnableCommunityPoolFeeFunding,
-	//}
 
 	for _, tc := range []struct {
 		desc                  string
@@ -278,6 +260,15 @@ func (suite *KeeperTestSuite) TestBurnDenomMsg() {
 			valid:                 false,
 			amount:                1,
 			expectedMessageEvents: 0,
+			capabilities:          capabilities_EnableBurnFrom_DISABLED,
+		},
+		{
+			desc:                  "EnableBurnFrom DISABLED: successful burn of admin's own factory denom coins",
+			burnDenom:             suite.defaultDenom,
+			admin:                 suite.TestAccs[0].String(),
+			valid:                 true,
+			amount:                1,
+			expectedMessageEvents: 1,
 			capabilities:          capabilities_EnableBurnFrom_DISABLED,
 		},
 	} {

@@ -96,7 +96,12 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		return nil, err
 	}
 
+	// The following code section is exclusively for case when:
+	//  * either burning someone's else's tokens
+	//  * or burning own tokens, but EnableBurnOwn is disabled
 	if !(isBurningOwn && server.IsCapabilityEnabled(types.EnableBurnOwn)) {
+		// Denom admin *can* burn its own tokens even if the EnableBurnFrom is *disabled*.
+		// This is sensical, as the admin burns it sown tokens and *not* tokens from another account.
 		if !isBurningOwn && !server.IsCapabilityEnabled(types.EnableBurnFrom) {
 			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableBurnFrom)
 		}
