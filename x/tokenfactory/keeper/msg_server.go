@@ -96,9 +96,24 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 		return nil, err
 	}
 
+	// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
+	if _, _, err := types.DeconstructDenom(msg.Amount.GetDenom()); err == nil {
+		// Denomination *MUST* already exist:
+		_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
+		if !denomExists {
+			return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
+		}
+	} else {
+		sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
+		if !sudoEnabled {
+			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)
+		}
+	}
+
 	// The following code section is exclusively for case when:
 	//  * either burning someone's else's tokens
 	//  * or burning own tokens, but EnableBurnOwn is disabled
+	// In both cases denom admin must be the one executing the burn.
 	if !(isBurningOwn && server.IsCapabilityEnabled(types.EnableBurnOwn)) {
 		// Denom admin *can* burn its own tokens even if the EnableBurnFrom is *disabled*.
 		// This is sensical, as the admin burns it sown tokens and *not* tokens from another account.
@@ -106,21 +121,11 @@ func (server msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.
 			return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableBurnFrom)
 		}
 
-		// verify that denom is an x/tokenfactory denom, and if it is not, then sudo mint capability must be enabled
-		if _, _, err := types.DeconstructDenom(msg.Amount.GetDenom()); err == nil {
-			// Denomination *MUST* already exist:
-			_, denomExists := server.bankKeeper.GetDenomMetaData(ctx, msg.Amount.Denom)
-			if !denomExists {
-				return nil, types.ErrDenomDoesNotExist.Wrapf("denom: %s", msg.Amount.Denom)
-			}
-		} else {
-			sudoEnabled := server.IsCapabilityEnabled(types.EnableSudoMint)
-			if !sudoEnabled {
-				return nil, types.ErrCapabilityNotEnabled.Wrapf("the '%s' capability is NOT enabled", types.EnableSudoMint)
-			}
+		if !isRegistered {
+			return nil, types.ErrUnauthorized.Wrapf("the '%s' denomination is not registered in tokenfactory", msg.Amount.GetDenom())
 		}
 
-		if !isRegistered || msg.Sender != authorityMetadata.GetAdmin() {
+		if msg.Sender != authorityMetadata.GetAdmin() {
 			return nil, types.ErrUnauthorized.Wrapf("the '%s' sender is NOT '%s' admin of the '%s' denomination", msg.Sender, authorityMetadata.GetAdmin(), msg.Amount.GetDenom())
 		}
 	}
